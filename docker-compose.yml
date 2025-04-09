@@ -1,0 +1,17 @@
+
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my-postgres
+    environment:
+      POSTGRES_USER: grema-store
+      POSTGRES_PASSWORD: Angaby2903
+      POSTGRES_DB: grema-store
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
