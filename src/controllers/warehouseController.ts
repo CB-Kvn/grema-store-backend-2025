@@ -77,7 +77,7 @@ export class WarehouseController {
         Number(req.params.productId),
         req.body.quantity,
         req.body.location,
-        req.body.price
+        Number(req.body.price)
       );
       res.json(result);
     } catch (error) {

@@ -33,7 +33,7 @@ router.delete('/:id', [auth, restrictTo('ADMIN')], warehouseController.deleteWar
 // Stock Management Routes
 router.post(
   '/:warehouseId/stock/:productId',
-  [auth, restrictTo('admin'), validate(stockValidation)],
+  [auth, restrictTo('ADMIN'), validate(stockValidation)],
   warehouseController.addStock
 );
 
