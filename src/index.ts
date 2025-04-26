@@ -15,6 +15,7 @@ import purchaseOrderRoutes from './routes/purchaseOrderRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import  photoRoutes  from './routes/photoRoutes';
 import { whatsappRoutes } from './routes/whatappsRoutes';
+import authRoutes from './routes/authRoutes';
 
 
 
@@ -117,6 +118,7 @@ app.use('/api/purchase-orders', purchaseOrderRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/photo', photoRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

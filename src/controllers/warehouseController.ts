@@ -76,7 +76,8 @@ export class WarehouseController {
         req.params.warehouseId,
         Number(req.params.productId),
         req.body.quantity,
-        req.body.location
+        req.body.location,
+        req.body.price
       );
       res.json(result);
     } catch (error) {
@@ -113,4 +114,26 @@ export class WarehouseController {
       res.status(500).json({ error: 'Error transferring stock' });
     }
   };
+
+  getWarehouseItemsByProductId = async (req: Request, res: Response) => {
+    try {
+      const productId = parseInt(req.params.productId, 10);
+
+      if (isNaN(productId)) {
+        return res.status(400).json({ error: 'Invalid productId' });
+      }
+
+      const warehouseItems = await this.warehouseService.getWarehouseItemsByProductId(productId);
+
+      if (!warehouseItems || warehouseItems.length === 0) {
+        return res.status(404).json({ message: 'No WarehouseItems found for the given productId' });
+      }
+
+      res.status(200).json(warehouseItems);
+    } catch (error) {
+      console.error('Error in getWarehouseItemsByProductId:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
 }

@@ -98,7 +98,23 @@ export class WarehouseService {
     }
   }
 
-  async addStock(warehouseId: string, productId: number, quantity: number, location: string) {
+  async getWarehouseItemsByProductId(productId: number) {
+    try {
+      return await prisma.warehouseItem.findMany({
+        where: { productId },
+        include: {
+          warehouse: true, // Incluye información del almacén relacionado
+          discount: true,  // Incluye información del descuento relacionado
+          images: true,    // Incluye imágenes relacionadas
+        },
+      });
+    } catch (error) {
+      console.error('Error in getWarehouseItemsByProductId:', error);
+      throw error;
+    }
+  }
+
+  async addStock(warehouseId: string, productId: number, quantity: number, location: string, price: number) {
     try {
       const item = await prisma.warehouseItem.findFirst({
         where: {
@@ -108,7 +124,7 @@ export class WarehouseService {
       });
 
       if (item) {
-        // Update existing item
+        // Actualiza el item existente
         const updatedItem = await prisma.warehouseItem.update({
           where: { id: item.id },
           data: {
@@ -117,37 +133,38 @@ export class WarehouseService {
           },
         });
 
-        // Create movement record
+        // Crea un registro de movimiento de stock
         await prisma.stockMovement.create({
           data: {
             itemId: item.id,
             type: 'IN',
             quantity,
-            userId: 'system', // Replace with actual user ID
+            userId: 'system', // Reemplaza con el ID del usuario real
           },
         });
 
         return updatedItem;
       } else {
-        // Create new item
+        // Crea un nuevo item
         const newItem = await prisma.warehouseItem.create({
           data: {
             warehouseId,
             productId,
             quantity,
             location,
-            minimumStock: 0, // Set default or accept as parameter
+            price, // Incluye el precio como obligatorio
+            minimumStock: 0, // Establece un valor predeterminado o acepta como parámetro
             status: 'IN_STOCK',
           },
         });
 
-        // Create movement record
+        // Crea un registro de movimiento de stock
         await prisma.stockMovement.create({
           data: {
             itemId: newItem.id,
             type: 'IN',
             quantity,
-            userId: 'system', // Replace with actual user ID
+            userId: 'system', // Reemplaza con el ID del usuario real
           },
         });
 
@@ -214,7 +231,7 @@ export class WarehouseService {
         await this.removeStock(sourceWarehouseId, productId, quantity);
 
         // Add to target
-        await this.addStock(targetWarehouseId, productId, quantity, '');
+        await this.addStock(targetWarehouseId, productId, quantity, '', 0); // Replace 0 with the appropriate price value
 
         return { success: true, message: 'Stock transferred successfully' };
       });

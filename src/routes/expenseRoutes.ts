@@ -32,9 +32,9 @@ const dateRangeValidation = [
 // Routes
 router.get('/', auth, expenseController.getAllExpenses);
 router.get('/:id', auth, expenseController.getExpenseById);
-router.post('/', [auth, restrictTo('admin'), validate(expenseValidation)], expenseController.createExpense);
-router.put('/:id', [auth, restrictTo('admin'), validate(expenseValidation)], expenseController.updateExpense);
-router.delete('/:id', [auth, restrictTo('admin')], expenseController.deleteExpense);
+router.post('/', [auth, restrictTo('ADMIN'), validate(expenseValidation)], expenseController.createExpense);
+router.put('/:id', [auth, restrictTo('ADMIN'), validate(expenseValidation)], expenseController.updateExpense);
+router.delete('/:id', [auth, restrictTo('ADMIN')], expenseController.deleteExpense);
 
 // Additional Routes
 router.get('/category/:category', auth, expenseController.getExpensesByCategory);

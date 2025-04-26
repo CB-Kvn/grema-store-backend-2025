@@ -18,11 +18,24 @@ const productValidation = [
   body('details').isObject().withMessage('Details must be an object'),
 ];
 
+// Validation rules for bulk creation
+const bulkProductValidation = [
+  body().isArray().withMessage('Request body must be an array of products'),
+  body('*.name').notEmpty().withMessage('Name is required for each product'),
+  body('*.price').isFloat({ min: 0 }).withMessage('Price must be a positive number for each product'),
+  body('*.description').notEmpty().withMessage('Description is required for each product'),
+  body('*.category').notEmpty().withMessage('Category is required for each product'),
+  body('*.sku').notEmpty().withMessage('SKU is required for each product'),
+  // body('*.images').isArray().withMessage('Images must be an array for each product'),
+  body('*.details').isObject().withMessage('Details must be an object for each product'),
+];
+
 // Routes
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
-router.post('/', [auth, restrictTo('admin'), validate(productValidation)], productController.createProduct);
+router.post('/', [auth, restrictTo('ADMIN'), validate(productValidation)], productController.createProduct);
 router.put('/:id', [auth, restrictTo('admin'), validate(productValidation)], productController.updateProduct);
 router.delete('/:id', [auth, restrictTo('admin')], productController.deleteProduct);
+router.post('/bulk', [auth, restrictTo('ADMIN'), validate(bulkProductValidation)], productController.createProductsBulk);
 
 export default router;
