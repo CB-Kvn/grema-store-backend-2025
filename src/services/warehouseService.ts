@@ -105,7 +105,7 @@ export class WarehouseService {
         include: {
           warehouse: true, // Incluye información del almacén relacionado
           discount: true,  // Incluye información del descuento relacionado
-          images: true,    // Incluye imágenes relacionadas
+          product:true   // Incluye imágenes relacionadas
         },
       });
     } catch (error) {

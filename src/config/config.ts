@@ -2,8 +2,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 // Cargar variables de entorno según el ambiente
-const envFile = process.env.NODE_ENV === 'production' 
-  ? 'prod.env' 
+const envFile = process.env.NODE_ENV === 'production'
+  ? 'prod.env'
   : 'dev.env';
 
 dotenv.config({
@@ -24,6 +24,9 @@ export const config = {
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+  IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY,
+  IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
+  IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT,
   isDev: () => process.env.NODE_ENV === 'development',
   isProd: () => process.env.NODE_ENV === 'production'
 };

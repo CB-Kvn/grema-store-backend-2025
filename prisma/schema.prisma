@@ -45,6 +45,7 @@ model Product {
   updatedAt   DateTime @updatedAt
   CartItem    CartItem[]
   WarehouseItem WarehouseItem[]
+  Images       Image[]
   OrderItem   OrderItem[]
 }
 
@@ -72,8 +73,8 @@ enum DiscountType {
 model Image {
   id             Int            @id @default(autoincrement())
   url            String
-  warehouseItemId String
-  warehouseItem  WarehouseItem  @relation(fields: [warehouseItemId], references: [id])
+  productId Int
+  Product  Product  @relation(fields: [productId], references: [id])
 }
 
 model Cart {
@@ -126,7 +127,6 @@ model WarehouseItem {
   location     String
   price        Float          // Precio del producto en este inventario
   discount     Discount?      // Descuento asociado al producto en este inventario
-  images       Image[]        // Imágenes asociadas al producto en este inventario
   status       StockStatus    @default(IN_STOCK)
   lastUpdated  DateTime       @default(now())
   movements    StockMovement[]

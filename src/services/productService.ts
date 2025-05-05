@@ -8,9 +8,10 @@ export class ProductService {
         include: {
           WarehouseItem: {
             include: {
-              discount: true, // Incluye la información de Discount
+              discount: true, 
             },
           },
+          Images: true, // Incluye la información de Images
         },
       });
     } catch (error) {
@@ -29,6 +30,7 @@ export class ProductService {
               discount: true, // Incluye la información de Discount
             },
           },
+          Images: true,
         },
       });
     } catch (error) {
