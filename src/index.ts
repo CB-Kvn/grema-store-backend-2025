@@ -51,6 +51,7 @@ const limiter = rateLimit(
 app.use('/api', limiter);
 
 // CORS configuration - Diferente por ambiente
+
 const corsOptions = {
   development: {
     origin: process.env.CORS_ORIGIN,
@@ -173,5 +174,3 @@ process.on('SIGTERM', () => {
     process.exit(0);
   });
 });
-
-export default app;
