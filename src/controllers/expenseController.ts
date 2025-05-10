@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ExpenseService } from '../services/expenseService';
 import { logger } from '../utils/logger';
 
+const expenseService = new ExpenseService();
 
 export class ExpenseController {
   private expenseService: ExpenseService;
@@ -94,4 +95,19 @@ export class ExpenseController {
       res.status(500).json({ error: 'Error getting expenses by date range' });
     }
   };
+
+  async uploadFile(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: 'No file uploaded' });
+        return;
+      }
+
+      const filePath = await expenseService.saveFile(req.file);
+      res.status(200).json({ message: 'File uploaded successfully', filePath });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      res.status(500).json({ error: 'Error uploading file' });
+    }
+  }
 }

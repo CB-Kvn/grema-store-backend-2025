@@ -16,6 +16,7 @@ import expenseRoutes from './routes/expenseRoutes';
 import  photoRoutes  from './routes/photoRoutes';
 import { whatsappRoutes } from './routes/whatappsRoutes';
 import authRoutes from './routes/authRoutes';
+import { dateValidatorMiddleware } from './middleware/dateVerify';
 
 
 
@@ -111,6 +112,24 @@ app.use((req, res, next) => {
   res.set(securityHeaders);
   next();
 });
+
+// Middleware para serializar fechas a ISO strings
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  
+  res.json = function (data) {
+    const transformedData = JSON.parse(
+      JSON.stringify(data, (key, value) =>
+        value instanceof Date ? value.toISOString() : value
+      )
+    );
+    return originalJson.call(this, transformedData);
+  };
+
+  next();
+});
+
+app.use(dateValidatorMiddleware(['date', 'startDate', 'endDate','passwordChangedAt','lastInventoryDate'])); 
 
 // Routes
 app.use('/api/products', productRoutes);

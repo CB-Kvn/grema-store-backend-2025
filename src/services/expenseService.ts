@@ -1,5 +1,8 @@
 import prisma from '../config/database';
 import { logger } from '../utils/logger';
+import fs from 'fs';
+import path from 'path';
+// import { UploadedFile } from 'multer';
 
 
 export class ExpenseService {
@@ -117,6 +120,16 @@ export class ExpenseService {
     } catch (error) {
       logger.error('Error in getExpensesSummary:', error);
       throw error;
+    }
+  }
+
+  async saveFile(file: any): Promise<string> {
+    try {
+      // Devuelve la ruta relativa del archivo
+      return `/uploads/expenses/${file.filename}`;
+    } catch (error) {
+      console.error('Error saving file:', error);
+      throw new Error('Error saving file');
     }
   }
 }
