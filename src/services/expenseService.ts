@@ -9,6 +9,9 @@ export class ExpenseService {
   async getAllExpenses() {
     try {
       return await prisma.expense.findMany({
+        where: {
+          state: true, // Solo registros con state = true
+        },
         orderBy: {
           date: 'desc',
         },
@@ -22,7 +25,10 @@ export class ExpenseService {
   async getExpenseById(id: string) {
     try {
       return await prisma.expense.findUnique({
-        where: { id },
+        where: {
+          id,
+          state: true, // Solo registros con state = true
+        },
       });
     } catch (error) {
       logger.error(`Error in getExpenseById: ${id}`, error);
@@ -55,8 +61,10 @@ export class ExpenseService {
 
   async deleteExpense(id: string) {
     try {
-      return await prisma.expense.delete({
+      // Actualiza el campo state a false en lugar de eliminar el registro
+      return await prisma.expense.update({
         where: { id },
+        data: { state: false },
       });
     } catch (error) {
       logger.error(`Error in deleteExpense: ${id}`, error);
@@ -69,6 +77,7 @@ export class ExpenseService {
       return await prisma.expense.findMany({
         where: {
           category: category as any,
+          state: true, // Solo registros con state = true
         },
         orderBy: {
           date: 'desc',
@@ -88,6 +97,7 @@ export class ExpenseService {
             gte: new Date(startDate),
             lte: new Date(endDate),
           },
+          state: true, // Solo registros con state = true
         },
         orderBy: {
           date: 'desc',

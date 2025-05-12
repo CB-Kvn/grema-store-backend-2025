@@ -63,7 +63,7 @@ router.get(
   [auth, validate(dateRangeValidation)],
   expenseController.getExpensesByDateRange
 );
-router.get('/download', expenseController.downloadFile);
+router.get('/file/download', expenseController.downloadFile);
 
 // Endpoint for file upload
 router.post(

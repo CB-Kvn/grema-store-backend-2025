@@ -224,6 +224,7 @@ model Expense {
   taxes Float
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now())
+  state       Boolean       @default(true)
   userId      String        // Track who created the expense
   approvedBy  String?       // Track who approved the expense
   approvedAt  DateTime?     // Track when it was approved
