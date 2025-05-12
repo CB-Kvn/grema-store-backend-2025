@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ExpenseService } from '../services/expenseService';
 import { logger } from '../utils/logger';
-
+import path from 'path';
 
 export class ExpenseController {
   private expenseService: ExpenseService;
@@ -94,4 +94,31 @@ export class ExpenseController {
       res.status(500).json({ error: 'Error getting expenses by date range' });
     }
   };
+   downloadFile = async  (req: Request, res: Response): Promise<void> => {
+    const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
+    try {
+      const { filePath } = req.query;
+
+      if (!filePath || typeof filePath !== 'string') {
+        res.status(400).json({ error: 'File path is required' });
+      }
+
+      const fileExtension = path.extname(filePath as string);
+      if (!allowedExtensions.includes(fileExtension)) {
+        res.status(400).json({ error: 'Invalid file type' });
+      }
+
+      const absolutePath = path.join(__dirname, '../..', filePath as string);
+
+      res.download(absolutePath, (err) => {
+        if (err) {
+          console.error('Error downloading file:', err);
+          res.status(500).json({ error: 'Error downloading file' });
+        }
+      });
+    } catch (error) {
+      console.error('Error in downloadFile:', error);
+      res.status(500).json({ error: 'Error processing request' });
+    }
+  }
 }

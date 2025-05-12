@@ -43,5 +43,6 @@ router.get(
   [auth, validate(dateRangeValidation)],
   expenseController.getExpensesByDateRange
 );
+router.get('/download', expenseController.downloadFile);
 
 export default router;
