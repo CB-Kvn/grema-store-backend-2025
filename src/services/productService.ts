@@ -111,4 +111,28 @@ export class ProductService {
       throw error;
     }
   }
+
+  async createImage(data: { url: string; productId: number }) {
+    
+    return prisma.image.create({
+      data: { url: data.url, productId: data.productId, state: true }
+    });
+  }
+  async updateImage(id: number, url?: string, state?: boolean, productId?: number ) {
+    return prisma.image.update({
+      where: { id },
+      data:{
+        url: url,
+        state: state,
+        productId: productId
+      },
+    });
+  }
+  async deleteImage(id: number) {
+    // Soft delete: set state to false
+    return prisma.image.update({
+      where: { id },
+      data: { state: false },
+    });
+  }
 }

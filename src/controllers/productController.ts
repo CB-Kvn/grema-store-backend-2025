@@ -3,15 +3,16 @@ import { ProductService } from '../services/productService';
 import { PhotoController } from './photoController';
 import ImageKitService from '../services/imageKitService';
 
+
 const productService = new ProductService();
 const imageKitService = new ImageKitService();
 
 export class ProductController {
-  
+
   getAllProducts = async (req: Request, res: Response) => {
     try {
       const products = await productService.getAllProducts();
-  
+
       // Procesa cada producto para agregar las imágenes
       const productsWithImages = await Promise.all(
         products.map(async (product: any) => {
@@ -34,25 +35,25 @@ export class ProductController {
               return { ...image, url: [] }; // Devuelve un array vacío si `url` no es válido
             })
           );
-  
-          return { ...product, Images: imagesWithUrls };
+
+          return { ...product, Images: imagesWithUrls, filepaths: product.Images };
         })
       );
-  
+
       res.status(200).json(productsWithImages);
     } catch (error) {
       console.error('Error in getAllProducts:', error);
       res.status(500).json({ error: 'Error getting products' });
     }
   };
-  
+
   getProductById = async (req: Request, res: Response) => {
     try {
       const product = await productService.getProductById(parseInt(req.params.id));
       if (!product) {
         return res.status(404).json({ error: 'Product not found' });
       }
-  
+
       // Procesa las imágenes del producto
       const imagesWithUrls = await Promise.all(
         product.Images.map(async (image: any) => {
@@ -73,8 +74,8 @@ export class ProductController {
           return { ...image, url: [] }; // Devuelve un array vacío si `url` no es válido
         })
       );
-  
-      res.json({ ...product, Images: imagesWithUrls });
+
+      res.json({ ...product, Images: imagesWithUrls, filepaths: product.Images });
     } catch (error) {
       console.error('Error in getProductById:', error);
       res.status(500).json({ error: 'Error getting product' });
@@ -132,5 +133,68 @@ export class ProductController {
         details: error.message,
       });
     }
+  }
+  async createImage(req: Request, res: Response) {
+    const { url, productId } = req.body;
+    const image = await productService.createImage({ url, productId }) as any;
+
+    if (!image) {
+      return res.status(400).json({ error: 'Failed to create image' });
+    }
+
+    const convertJsonImage = JSON.parse(image.url);
+
+    const urls = convertJsonImage.map((location: any) => {
+        if (typeof location === 'string' && location.trim() !== '') {
+          try {
+              console.log('location', location);
+            return imageKitService.getUrl(location);
+          } catch (parseError) {
+            console.error('Error parsing image URL:', parseError);
+            return [];
+          }
+        }
+        return [];
+      })
+
+    res.status(201).json(urls);
+  }
+
+  updateImage = async (req: Request, res: Response) => {
+    try {
+      const image = await productService.updateImage(
+        parseInt(req.body.id),
+        JSON.stringify(req.body.url),
+        req.body.state,
+        req.body.productId
+      );
+      if (!image) {
+        return res.status(400).json({ error: 'Failed to update image' });
+      }
+
+      const convertJsonImage = JSON.parse(image.url);
+
+      const urls = convertJsonImage.map((location: any) => {
+        if (typeof location === 'string' && location.trim() !== '') {
+          try {
+              console.log('location', location);
+            return imageKitService.getUrl(location);
+          } catch (parseError) {
+            console.error('Error parsing image URL:', parseError);
+            return [];
+          }
+        }
+        return [];
+      })
+      res.json(urls);
+    } catch (error) {
+      res.status(500).json({ error: 'Error updating product' });
+    }
+  };
+
+  async deleteImage(req: Request, res: Response) {
+    const id = parseInt(req.params.id);
+    await productService.deleteImage(id);
+    res.status(204).send();
   }
 }

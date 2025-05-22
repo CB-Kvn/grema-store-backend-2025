@@ -33,9 +33,12 @@ const bulkProductValidation = [
 // Routes
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
-router.post('/', [auth, restrictTo('ADMIN'), validate(productValidation)], productController.createProduct);
+router.post('/', [auth, restrictTo('ADMIN')], productController.createProduct);
 router.put('/:id', [auth, restrictTo('admin'), validate(productValidation)], productController.updateProduct);
 router.delete('/:id', [auth, restrictTo('admin')], productController.deleteProduct);
 router.post('/bulk', [auth, restrictTo('ADMIN'), validate(bulkProductValidation)], productController.createProductsBulk);
+router.post('/image-create', productController.createImage);
+router.post('/image-update', productController.updateImage);
+router.delete('/image-delete/:id', productController.deleteImage);
 
 export default router;

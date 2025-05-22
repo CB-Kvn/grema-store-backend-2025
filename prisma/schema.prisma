@@ -36,11 +36,11 @@ enum Role {
 
 model Product {
   id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  category    String
-  sku         String   @unique
-  details     Json
+  name        String?
+  description String?
+  category    String?
+  sku         String?   @unique
+  details     Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   CartItem    CartItem[]
@@ -73,7 +73,8 @@ enum DiscountType {
 model Image {
   id             Int            @id @default(autoincrement())
   url            String
-  productId Int
+  state           Boolean  @default(true)
+  productId Int 
   Product  Product  @relation(fields: [productId], references: [id])
 }
 
