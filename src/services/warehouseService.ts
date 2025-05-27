@@ -128,7 +128,7 @@ export class WarehouseService {
         const updatedItem = await prisma.warehouseItem.update({
           where: { id: item.id },
           data: {
-            quantity: quantity,
+            quantity: item.quantity + quantity,
             status: this.calculateStockStatus(quantity, item.minimumStock),
           },
         });

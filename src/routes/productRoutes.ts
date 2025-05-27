@@ -14,7 +14,7 @@ const productValidation = [
   body('description').notEmpty().withMessage('Description is required'),
   body('category').notEmpty().withMessage('Category is required'),
   body('sku').notEmpty().withMessage('SKU is required'),
-  body('images').isArray().withMessage('Images must be an array'),
+  // body('images').isArray().withMessage('Images must be an array'),
   body('details').isObject().withMessage('Details must be an object'),
 ];
 
@@ -34,8 +34,8 @@ const bulkProductValidation = [
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
 router.post('/', [auth, restrictTo('ADMIN')], productController.createProduct);
-router.put('/:id', [auth, restrictTo('admin'), validate(productValidation)], productController.updateProduct);
-router.delete('/:id', [auth, restrictTo('admin')], productController.deleteProduct);
+router.put('/:id', [auth, restrictTo('ADMIN'), validate(productValidation)], productController.updateProduct);
+router.delete('/:id', [auth, restrictTo('ADMIN')], productController.deleteProduct);
 router.post('/bulk', [auth, restrictTo('ADMIN'), validate(bulkProductValidation)], productController.createProductsBulk);
 router.post('/image-create', productController.createImage);
 router.post('/image-update', productController.updateImage);

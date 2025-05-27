@@ -43,6 +43,7 @@ model Product {
   details     Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  available   Boolean @default(true)
   CartItem    CartItem[]
   WarehouseItem WarehouseItem[]
   Images       Image[]

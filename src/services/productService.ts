@@ -5,13 +5,14 @@ export class ProductService {
   async getAllProducts() {
     try {
       return await prisma.product.findMany({
+        where: { available: true },
         include: {
           WarehouseItem: {
             include: {
-              discount: true, 
+              discount: true,
             },
           },
-          Images: true, // Incluye la información de Images
+          Images: true,
         },
       });
     } catch (error) {
@@ -23,11 +24,11 @@ export class ProductService {
   async getProductById(id: number) {
     try {
       return await prisma.product.findUnique({
-        where: { id },
+        where: { id, available: true },
         include: {
           WarehouseItem: {
             include: {
-              discount: true, // Incluye la información de Discount
+              discount: true,
             },
           },
           Images: true,
@@ -76,8 +77,9 @@ export class ProductService {
 
   async deleteProduct(id: number) {
     try {
-      return await prisma.product.delete({
+      return await prisma.product.update({
         where: { id },
+        data: { available: false },
       });
     } catch (error) {
       logger.error(`Error in deleteProduct: ${id}`, error);
