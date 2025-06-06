@@ -43,16 +43,17 @@ export class WarehouseService {
     try {
       return await prisma.warehouse.create({
         data: {
-          ...data,
-          items: {
-            create: data.items?.map((item: any) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              minimumStock: item.minimumStock,
-              location: item.location,
-              status: item.status,
-            })),
-          },
+          name: data.name,
+          location: data.location,
+          address: data.address,
+          manager: data.manager,
+          phone: data.phone,
+          email: data.email,
+          capacity: data.capacity,
+          currentOccupancy: data.currentOccupancy ?? 0,
+          status: data.status ?? 'ACTIVE',
+          lastInventoryDate: data.lastInventoryDate ?? null,
+          notes: data.notes ?? null,
         },
         include: {
           items: true,
