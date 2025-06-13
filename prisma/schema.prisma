@@ -52,8 +52,6 @@ model Product {
 
 model Discount {
   id           Int           @id @default(autoincrement())
-  warehouseItemId String      @unique
-  warehouseItem  WarehouseItem @relation(fields: [warehouseItemId], references: [id])
   type         DiscountType
   value        Float
   startDate    DateTime
@@ -63,6 +61,7 @@ model Discount {
   maxQuantity  Int?           // Maximum quantity allowed for discount
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  items       Int[] 
 }
 
 enum DiscountType {
@@ -128,7 +127,6 @@ model WarehouseItem {
   minimumStock Int
   location     String
   price        Float          // Precio del producto en este inventario
-  discount     Discount?      // Descuento asociado al producto en este inventario
   status       StockStatus    @default(IN_STOCK)
   lastUpdated  DateTime       @updatedAt
   movements    StockMovement[]

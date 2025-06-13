@@ -105,7 +105,6 @@ export class WarehouseService {
         where: { productId },
         include: {
           warehouse: true, // Incluye información del almacén relacionado
-          discount: true,  // Incluye información del descuento relacionado
           product:true   // Incluye imágenes relacionadas
         },
       });

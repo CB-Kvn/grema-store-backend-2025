@@ -7,11 +7,7 @@ export class ProductService {
       return await prisma.product.findMany({
         where: { available: true },
         include: {
-          WarehouseItem: {
-            include: {
-              discount: true,
-            },
-          },
+          WarehouseItem:true,
           Images: true,
         },
       });
@@ -26,11 +22,7 @@ export class ProductService {
       return await prisma.product.findUnique({
         where: { id, available: true },
         include: {
-          WarehouseItem: {
-            include: {
-              discount: true,
-            },
-          },
+          WarehouseItem: true,
           Images: true,
         },
       });

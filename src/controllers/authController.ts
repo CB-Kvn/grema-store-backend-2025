@@ -58,13 +58,29 @@ export class AuthController {
         return res.status(401).json({ error: 'Usuario no autenticado' });
       }
       res.status(200).json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-    });
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+      });
     } catch (error: any) {
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
+  static async getAll(req: Request, res: Response) {
+    const users = await authService.getAll();
+    res.json(users);
+  }
+
+  static async update(req: Request, res: Response) {
+    const { id } = req.params;
+    const data = req.body;
+    try {
+      const user = await authService.update(id, data);
+      res.json(user);
+    } catch (error) {
+      res.status(400).json({ error: 'No se pudo actualizar el usuario.' });
+    }
+  }
+
 }

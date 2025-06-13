@@ -76,4 +76,15 @@ export class AuthService {
       },
     };
   };
+
+  async getAll() {
+    return prisma.google.findMany();
+  }
+
+  async update(id: string, data: any) {
+    return prisma.google.update({
+      where: { id },
+      data,
+    });
+  }
 }

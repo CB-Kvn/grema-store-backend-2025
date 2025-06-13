@@ -21,5 +21,8 @@ router.post('/login', validate(loginValidation), AuthController.login);
 router.post('/register', validate(registerValidation), AuthController.register);
 router.post('/google-login', AuthController.googleLogin);
 router.get('/authenticate', [authenticateToken], AuthController.authController);
+router.get('/users-all', AuthController.getAll.bind(AuthController));
+router.put('/user/:id', AuthController.update.bind(AuthController));
+
 
 export default router;
