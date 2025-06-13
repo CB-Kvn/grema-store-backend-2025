@@ -2,6 +2,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../config/database';
 import { AppError } from '../middleware/errorHandler';
+import { GoogleUser } from '../types';
+import axios from 'axios';
+import { generateToken } from '../utils/tokens';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = '7d';
@@ -35,4 +38,42 @@ export class AuthService {
 
     return { id: user.id, email: user.email, role: user.role };
   }
+
+  async verifyGoogleToken(tokenId: string) {
+    const url = `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`;
+    const { data } = await axios.get<GoogleUser>(url);
+
+    if (!data.email || data.email_verified !== 'true') {
+      throw new Error('Correo electrónico no verificado');
+    }
+
+    // Aquí podrías guardar o buscar el usuario en tu base de datos
+    let user = await prisma.google.findMany({ where: { googleId: data.sub, email: data.email } });
+
+    if (!user || user.length === 0) {
+       await prisma.google.create({
+        data: {
+          googleId: data.sub,
+          email: data.email,
+          name: data.name,
+          avatar: data.picture,
+        },
+      });
+    }
+
+    const token = generateToken({
+      email: data.email,
+      name: data.name,
+      picture: data.picture,
+    });
+
+    return {
+      token,
+      user: {
+        email: data.email,
+        name: data.name,
+        picture: data.picture,
+      },
+    };
+  };
 }

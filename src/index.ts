@@ -17,7 +17,7 @@ import  photoRoutes  from './routes/photoRoutes';
 import { whatsappRoutes } from './routes/whatappsRoutes';
 import authRoutes from './routes/authRoutes';
 import { dateValidatorMiddleware } from './middleware/dateVerify';
-
+import cookieParser from 'cookie-parser';
 
 
 // Cargar variables de entorno según el ambiente
@@ -30,6 +30,7 @@ const app = express();
 app.use(helmet()); // Set security HTTP headers
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 app.use(sanitizeInput);// Prevent XSS attacks
+app.use(cookieParser()); 
 
 // Rate limiting - Configuración diferente por ambiente
 const rateLimitConfig = {

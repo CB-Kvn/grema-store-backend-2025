@@ -11,3 +11,11 @@ export interface Photo {
     description?: string;
     createdAt: Date;
 }
+
+export interface GoogleUser {
+  email: string;
+  name: string;
+  picture: string;
+  email_verified: string;
+  sub: string; // Google user ID
+}

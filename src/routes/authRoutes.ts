@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { AuthController } from '../controllers/authController';
 import { body } from 'express-validator';
 import { validate } from '../middleware/validate';
+import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -18,5 +19,7 @@ const registerValidation = [
 
 router.post('/login', validate(loginValidation), AuthController.login);
 router.post('/register', validate(registerValidation), AuthController.register);
+router.post('/google-login', AuthController.googleLogin);
+router.get('/authenticate', [authenticateToken], AuthController.authController);
 
 export default router;

@@ -27,6 +27,7 @@ export const config = {
   IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY,
   IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
   IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   isDev: () => process.env.NODE_ENV === 'development',
   isProd: () => process.env.NODE_ENV === 'production'
 };

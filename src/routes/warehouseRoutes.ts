@@ -24,28 +24,25 @@ const stockValidation = [
 ];
 
 // Routes
-router.get('/', auth, warehouseController.getAllWarehouses);
-router.get('/:id', auth, warehouseController.getWarehouseById);
-router.post('/', [auth, restrictTo('ADMIN'), validate(warehouseValidation)], warehouseController.createWarehouse);
-router.put('/:id', [auth, restrictTo('ADMIN'), validate(warehouseValidation)], warehouseController.updateWarehouse);
-router.delete('/:id', [auth, restrictTo('ADMIN')], warehouseController.deleteWarehouse);
+router.get('/',  warehouseController.getAllWarehouses);
+router.get('/:id',  warehouseController.getWarehouseById);
+router.post('/', warehouseController.createWarehouse);
+router.put('/:id', warehouseController.updateWarehouse);
+router.delete('/:id', warehouseController.deleteWarehouse);
 
 // Stock Management Routes
 router.post(
   '/:warehouseId/stock/:productId',
-  [auth, restrictTo('ADMIN')],
   warehouseController.addStock
 );
 
 router.delete(
   '/:warehouseId/stock/:productId',
-  [auth, restrictTo('ADMIN'), validate([body('quantity').isInt({ min: 1 })])],
   warehouseController.removeStock
 );
 
 router.post(
   '/transfer/:sourceWarehouseId/:targetWarehouseId/:productId',
-  [auth, restrictTo('ADMIN'), validate([body('quantity').isInt({ min: 1 })])],
   warehouseController.transferStock
 );
 

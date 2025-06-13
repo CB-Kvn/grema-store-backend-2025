@@ -50,25 +50,23 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Routes
-router.get('/', auth, expenseController.getAllExpenses);
-router.get('/:id', auth, expenseController.getExpenseById);
-router.post('/', [auth, restrictTo('ADMIN'), validate(expenseValidation)], expenseController.createExpense);
-router.put('/:id', [auth, restrictTo('ADMIN'), validate(expenseValidation)], expenseController.updateExpense);
-router.delete('/:id', [auth, restrictTo('ADMIN')], expenseController.deleteExpense);
+router.get('/',expenseController.getAllExpenses);
+router.get('/:id', expenseController.getExpenseById);
+router.post('/', expenseController.createExpense);
+router.put('/:id',  expenseController.updateExpense);
+router.delete('/:id',  expenseController.deleteExpense);
 
 // Additional Routes
 router.get('/category/:category', auth, expenseController.getExpensesByCategory);
 router.get(
   '/date-range',
-  [auth, validate(dateRangeValidation)],
   expenseController.getExpensesByDateRange
 );
 router.get('/file/download', expenseController.downloadFile);
 
 // Endpoint for file upload
 router.post(
-  '/upload',
-  [auth, restrictTo('ADMIN'), upload.single('file')], // Middleware for authentication and single file upload
+  '/upload',// Middleware for authentication and single file upload
   expenseController.uploadFile
 );
 
