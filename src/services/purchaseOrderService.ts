@@ -7,7 +7,6 @@ export class PurchaseOrderService {
     try {
       return await prisma.purchaseOrder.findMany({
         include: {
-          supplier: true,
           items: {
             include: {
               product: true,
@@ -27,7 +26,6 @@ export class PurchaseOrderService {
       return await prisma.purchaseOrder.findUnique({
         where: { id },
         include: {
-          supplier: true,
           items: {
             include: {
               product: true,
@@ -49,21 +47,20 @@ export class PurchaseOrderService {
           ...data,
           items: {
             create: data.items.map((item: any) => ({
-              productId: item.productId,
+              productId: item.product.id,
               quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              totalPrice: item.quantity * item.unitPrice,
+              unitPrice: item.product.WarehouseItem[0].price,
+              totalPrice: item.quantity * item.product.WarehouseItem[0].price,
             })),
           },
         },
-        include: {
-          supplier: true,
-          items: {
-            include: {
-              product: true,
-            },
-          },
-        },
+        // include: {
+        //   items: {
+        //     include: {
+        //       product: true,
+        //     },
+        //   },
+        // },
       });
     } catch (error) {
       logger.error('Error in createOrder:', error);
@@ -97,7 +94,6 @@ export class PurchaseOrderService {
           items: undefined, // Handle items separately
         },
         include: {
-          supplier: true,
           items: {
             include: {
               product: true,
@@ -155,6 +151,17 @@ export class PurchaseOrderService {
     } catch (error) {
       logger.error(`Error in updateDocument: ${documentId}`, error);
       throw error;
+    }
+  }
+
+  async saveFile(file: any): Promise<string> {
+    try {
+      // Devuelve la ruta relativa del archivo
+      console.log('Saving file:', file);
+      return `/uploads/vouchers/${file.filename}`;
+    } catch (error) {
+      console.error('Error saving file:', error);
+      throw new Error('Error saving file');
     }
   }
 }

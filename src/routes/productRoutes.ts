@@ -32,6 +32,8 @@ const bulkProductValidation = [
 
 // Routes
 router.get('/', productController.getAllProducts);
+router.get('/latest', productController.getLatestProducts);
+router.get('/best-sellers', productController.getBestSellingProducts);
 router.get('/:id', productController.getProductById);
 router.post('/',  productController.createProduct);
 router.put('/:id',  productController.updateProduct);
@@ -40,5 +42,4 @@ router.post('/bulk', productController.createProductsBulk);
 router.post('/image-create', productController.createImage);
 router.post('/image-update', productController.updateImage);
 router.delete('/image-delete/:id', productController.deleteImage);
-
 export default router;

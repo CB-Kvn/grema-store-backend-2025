@@ -7,7 +7,7 @@ export class ProductService {
       return await prisma.product.findMany({
         where: { available: true },
         include: {
-          WarehouseItem:true,
+          WarehouseItem: true,
           Images: true,
         },
       });
@@ -107,15 +107,15 @@ export class ProductService {
   }
 
   async createImage(data: { url: string; productId: number }) {
-    
+
     return prisma.image.create({
       data: { url: data.url, productId: data.productId, state: true }
     });
   }
-  async updateImage(id: number, url?: string, state?: boolean, productId?: number ) {
+  async updateImage(id: number, url?: string, state?: boolean, productId?: number) {
     return prisma.image.update({
       where: { id },
-      data:{
+      data: {
         url: url,
         state: state,
         productId: productId
@@ -127,6 +127,54 @@ export class ProductService {
     return prisma.image.update({
       where: { id },
       data: { state: false },
+    });
+  }
+  async getLatestProducts(limit: number = 12) {
+    try {
+      return await prisma.product.findMany({
+        where: { available: true },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        include: {
+          WarehouseItem: true,
+          Images: true,
+        },
+      });
+    } catch (error) {
+      logger.error('Error in getLatestProducts:', error);
+      throw error;
+    }
+  }
+  async getBestSellingProducts(limit: number = 12) {
+    // Consulta los productos más vendidos usando OrderItem
+    const bestSellers = await prisma.orderItem.groupBy({
+      by: ['productId'],
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: limit,
+    });
+
+    if (bestSellers.length === 0) {
+      // Si no hay ventas, devuelve productos aleatorios
+      return prisma.product.findMany({
+        where: { available: true },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        include: {
+          WarehouseItem: true,
+          Images: true,
+        },
+      });
+    }
+
+    // Obtiene los productos más vendidos por sus IDs
+    const productIds = bestSellers.map((item) => item.productId);
+    return prisma.product.findMany({
+      where: { id: { in: productIds }, available: true },
+      include: {
+        WarehouseItem: true,
+        Images: true,
+      },
     });
   }
 }

@@ -65,9 +65,6 @@ router.get(
 router.get('/file/download', expenseController.downloadFile);
 
 // Endpoint for file upload
-router.post(
-  '/upload',// Middleware for authentication and single file upload
-  expenseController.uploadFile
-);
+router.post('/upload',upload.single('file'),expenseController.uploadFile);
 
 export default router;

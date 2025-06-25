@@ -146,19 +146,25 @@ model StockMovement {
 
 model PurchaseOrder {
   id                  String            @id @default(uuid())
-  orderNumber        String            @unique
-  supplierId         String
-  supplier           Supplier          @relation(fields: [supplierId], references: [id])
-  status             OrderStatus       @default(PENDING)
-  orderDate          DateTime          @default(now())
-  expectedDeliveryDate DateTime
-  actualDeliveryDate  DateTime?
+  buyerId             String
+  firstName           String
+  lastName            String
+  email               String
+  phone               String
+  orderNumber         String            @unique
+  dataShipping        String
+  dataBilling         String
+  status              OrderStatus       @default(PENDING)
+  orderDate           DateTime          @default(now())
+  expectedDeliveryDate DateTime         @default(now())
+  actualDeliveryDate  DateTime?         @default(now())
   items              OrderItem[]
+  subtotalAmount     Float
   totalAmount        Float
+  shippingAmount     Float
+  paymentMethod      String
   paymentStatus      PaymentStatus     @default(PENDING)
-  paymentTerms       String
   trackingNumber     String?
-  shippingMethod     String?
   notes              String?
   documents          Document[]
   createdAt          DateTime          @default(now())
@@ -194,22 +200,6 @@ model Document {
   size        Int          // Store file size in bytes
 }
 
-model Supplier {
-  id           String         @id @default(uuid())
-  name         String
-  contactPerson String
-  email        String
-  phone        String
-  address      String
-  taxId        String
-  paymentTerms String
-  rating       Float
-  status       SupplierStatus @default(ACTIVE)
-  notes        String?
-  orders       PurchaseOrder[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @default(now())
-}
 
 model Expense {
   id          String        @id @default(uuid())

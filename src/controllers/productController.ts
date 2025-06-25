@@ -197,4 +197,76 @@ export class ProductController {
     await productService.deleteImage(id);
     res.status(204).send();
   }
+  
+  async getLatestProducts (req: Request, res: Response) {
+    try {
+      const products = await productService.getLatestProducts(12);
+
+      const productsWithImages = await Promise.all(
+        products.map(async (product: any) => {
+          const imagesWithUrls = await Promise.all(
+            product.Images.map(async (image: any) => {
+              if (typeof image.url === 'string' && image.url.trim() !== '') {
+                try {
+                  const parsedUrls = JSON.parse(image.url);
+                  const resolvedUrls = await Promise.all(
+                    parsedUrls.map(async (location: string) => {
+                      return await imageKitService.getUrl(location);
+                    })
+                  );
+                  return { ...image, url: resolvedUrls };
+                } catch (parseError) {
+                  console.error('Error parsing image URL:', parseError);
+                  return { ...image, url: [] };
+                }
+              }
+              return { ...image, url: [] };
+            })
+          );
+          return { ...product, Images: imagesWithUrls, filepaths: product.Images };
+        })
+      );
+
+      res.status(200).json(productsWithImages);
+    } catch (error) {
+      console.error('Error in getLatestProducts:', error);
+      res.status(500).json({ error: 'Error getting latest products' });
+    }
+  };
+
+  async getBestSellingProducts   (req: Request, res: Response) {
+    try {
+      const products = await productService.getBestSellingProducts(12);
+
+      const productsWithImages = await Promise.all(
+        products.map(async (product: any) => {
+          const imagesWithUrls = await Promise.all(
+            product.Images.map(async (image: any) => {
+              if (typeof image.url === 'string' && image.url.trim() !== '') {
+                try {
+                  const parsedUrls = JSON.parse(image.url);
+                  const resolvedUrls = await Promise.all(
+                    parsedUrls.map(async (location: string) => {
+                      return await imageKitService.getUrl(location);
+                    })
+                  );
+                  return { ...image, url: resolvedUrls };
+                } catch (parseError) {
+                  console.error('Error parsing image URL:', parseError);
+                  return { ...image, url: [] };
+                }
+              }
+              return { ...image, url: [] };
+            })
+          );
+          return { ...product, Images: imagesWithUrls, filepaths: product.Images };
+        })
+      );
+
+      res.status(200).json(productsWithImages);
+    } catch (error) {
+      console.error('Error in getBestSellingProducts:', error);
+      res.status(500).json({ error: 'Error getting best selling products' });
+    }
+  };
 }

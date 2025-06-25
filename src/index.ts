@@ -18,6 +18,7 @@ import { whatsappRoutes } from './routes/whatappsRoutes';
 import authRoutes from './routes/authRoutes';
 import { dateValidatorMiddleware } from './middleware/dateVerify';
 import cookieParser from 'cookie-parser';
+import reportRoutes from './routes/reportsRoutes';
 
 
 // Cargar variables de entorno según el ambiente
@@ -140,7 +141,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/photo', photoRoutes);
 app.use('/api/auth', authRoutes);
-
+app.use('/api/reports', reportRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({

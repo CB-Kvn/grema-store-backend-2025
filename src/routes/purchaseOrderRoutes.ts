@@ -3,9 +3,30 @@ import { PurchaseOrderController } from '../controllers/purchaseOrderController'
 import { auth, restrictTo } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { body } from 'express-validator';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const router = Router();
 const purchaseOrderController = new PurchaseOrderController();
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../../uploads/purchaseOrders');
+    if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+    cb(null, uploadDir); // Directory where files will be stored
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, `${uniqueSuffix}-${file.originalname}`); // Unique name to avoid collisions
+  },
+});
+
+const upload = multer({ storage });
+
 
 // Validation rules
 const orderValidation = [
@@ -25,23 +46,29 @@ const documentValidation = [
 ];
 
 // Routes
-router.get('/', auth, purchaseOrderController.getAllOrders);
-router.get('/:id', auth, purchaseOrderController.getOrderById);
-router.post('/', [auth, restrictTo('admin'), validate(orderValidation)], purchaseOrderController.createOrder);
-router.put('/:id', [auth, restrictTo('admin'), validate(orderValidation)], purchaseOrderController.updateOrder);
-router.delete('/:id', [auth, restrictTo('admin')], purchaseOrderController.deleteOrder);
+router.get('/', purchaseOrderController.getAllOrders);
+router.get('/:id', purchaseOrderController.getOrderById);
+router.post('/', purchaseOrderController.createOrder);
+router.put('/:id', purchaseOrderController.updateOrder);
+router.delete('/:id', purchaseOrderController.deleteOrder);
 
 // Document Routes
+
 router.post(
   '/:orderId/documents',
-  [auth, restrictTo('admin'), validate(documentValidation)],
   purchaseOrderController.addDocument
 );
 
 router.put(
   '/documents/:documentId',
-  [auth, restrictTo('admin'), validate(documentValidation)],
+  [auth, restrictTo('ADMIN'), validate(documentValidation)],
   purchaseOrderController.updateDocument
+);
+
+router.post(
+  '/upload',
+  upload.single('file'),
+  purchaseOrderController.uploadFile
 );
 
 export default router;
