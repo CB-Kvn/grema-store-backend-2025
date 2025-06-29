@@ -180,6 +180,7 @@ model OrderItem {
   quantity     Int
   unitPrice    Float
   totalPrice   Float
+  qtyDone       Int?
   isGift       Boolean  @default(false) // Indica si el producto es un regalo
   isBestSeller Boolean  @default(false) // Indica si el producto es un "best seller"
   isNew        Boolean  @default(false) // Indica si el producto es nuevo
@@ -269,8 +270,8 @@ enum OrderStatus {
 
 enum OrderItemStatus {
   PENDING
-  RECEIVED
-  REJECTED
+  COMPLETED
+  UNCOMPLETED
 }
 
 enum PaymentStatus {

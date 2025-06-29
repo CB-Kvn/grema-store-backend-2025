@@ -70,35 +70,55 @@ export class PurchaseOrderService {
 
   async updateOrder(id: string, data: any) {
     try {
-      // Update items if provided
-      if (data.items) {
-        await prisma.orderItem.deleteMany({
-          where: { orderId: id },
-        });
+      const { items, documents, ...orderData } = data;
 
-        await prisma.orderItem.createMany({
-          data: data.items.map((item: any) => ({
-            orderId: id,
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            totalPrice: item.quantity * item.unitPrice,
-          })),
-        });
+      // 1. Elimina todos los items actuales (para evitar violar la relación requerida)
+      if (Array.isArray(items)) {
+        await prisma.orderItem.deleteMany({ where: { orderId: id } });
       }
 
+      // 2. Elimina todos los documentos actuales si los vas a reemplazar
+      if (Array.isArray(documents)) {
+        await prisma.document.deleteMany({ where: { orderId: id } });
+      }
+
+      // 3. Actualiza la orden y crea los nuevos items/documents
       return await prisma.purchaseOrder.update({
         where: { id },
         data: {
-          ...data,
-          items: undefined, // Handle items separately
+          ...orderData,
+          ...(Array.isArray(items) && {
+            items: {
+              create: items.map((item: any) => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                totalPrice: item.totalPrice,
+                qtyDone: item.qtyDone,
+                isGift: item.isGift,
+                isBestSeller: item.isBestSeller,
+                isNew: item.isNew,
+                status: item.status,
+              })),
+            }
+          }),
+          ...(Array.isArray(documents) && {
+            documents: {
+              create: documents.map((doc: any) => ({
+                type: doc.type,
+                title: doc.title,
+                url: doc.url,
+                uploadedAt: doc.uploadedAt,
+                status: doc.status,
+                hash: doc.hash,
+                mimeType: doc.mimeType,
+                size: doc.size,
+              })),
+            }
+          }),
         },
         include: {
-          items: {
-            include: {
-              product: true,
-            },
-          },
+          items: { include: { product: true } },
           documents: true,
         },
       });
