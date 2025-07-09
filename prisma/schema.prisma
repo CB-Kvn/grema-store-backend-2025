@@ -239,6 +239,7 @@ model Google {
   email    String? @unique
   name     String?
   avatar  String?
+  typeUser UserTypes? @default(BUYER)
   createdAt DateTime? @default(now())
 }
 
@@ -291,6 +292,11 @@ enum DocumentStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum UserTypes {
+  BUYER
+  ADMIN
 }
 
 enum SupplierStatus {

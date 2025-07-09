@@ -178,13 +178,13 @@ const server = app.listen(PORT, () => {
 // Handle process events
 process.on('uncaughtException', (err) => {
   logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-  logger.error(err.name, err.message);
+  logger.error(err.name, err);
   server.close(() => process.exit(1));
 });
 
 process.on('unhandledRejection', (err: Error) => {
   logger.error('UNHANDLED REJECTION! 💥 Shutting down...');
-  logger.error(err.name, err.message);
+  logger.error(err.name, err);
   server.close(() => process.exit(1));
 });
 

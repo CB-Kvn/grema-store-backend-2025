@@ -35,6 +35,7 @@ router.get('/', productController.getAllProducts);
 router.get('/latest', productController.getLatestProducts);
 router.get('/best-sellers', productController.getBestSellingProducts);
 router.get('/:id', productController.getProductById);
+router.get('/:id/pending-quantity', productController.getPendingOrderQuantity);
 router.post('/',  productController.createProduct);
 router.put('/:id',  productController.updateProduct);
 router.delete('/:id', productController.deleteProduct);

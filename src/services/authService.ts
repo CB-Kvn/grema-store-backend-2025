@@ -5,6 +5,7 @@ import { AppError } from '../middleware/errorHandler';
 import { GoogleUser } from '../types';
 import axios from 'axios';
 import { generateToken } from '../utils/tokens';
+import { logger } from '../utils/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = '7d';
@@ -42,16 +43,19 @@ export class AuthService {
   async verifyGoogleToken(tokenId: string) {
     const url = `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`;
     const { data } = await axios.get<GoogleUser>(url);
-
+    let user = await prisma.google.findMany({ where: { googleId: data.sub, email: data.email } });
+    
     if (!data.email || data.email_verified !== 'true') {
       throw new Error('Correo electrónico no verificado');
     }
 
+    logger.info('[Google Login] User found:', data);
     // Aquí podrías guardar o buscar el usuario en tu base de datos
-    let user = await prisma.google.findMany({ where: { googleId: data.sub, email: data.email } });
+
+    logger.info('[Google Login] User found:', user);
 
     if (!user || user.length === 0) {
-       await prisma.google.create({
+      const createdUser = await prisma.google.create({
         data: {
           googleId: data.sub,
           email: data.email,
@@ -59,6 +63,7 @@ export class AuthService {
           avatar: data.picture,
         },
       });
+      user = [createdUser];
     }
 
     const token = generateToken({
@@ -70,9 +75,10 @@ export class AuthService {
     return {
       token,
       user: {
-        email: data.email,
-        name: data.name,
-        picture: data.picture,
+        email: data.email || user[0].email || '',
+        name: data.name || user[0].name || '',
+        picture: data.picture || user[0].avatar || '',
+        typeUser: user[0].typeUser || '',
       },
     };
   };

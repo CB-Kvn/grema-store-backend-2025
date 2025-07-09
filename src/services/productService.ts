@@ -112,15 +112,42 @@ export class ProductService {
       data: { url: data.url, productId: data.productId, state: true }
     });
   }
-  async updateImage(id: number, url?: string, state?: boolean, productId?: number) {
-    return prisma.image.update({
-      where: { id },
-      data: {
-        url: url,
-        state: state,
-        productId: productId
-      },
-    });
+  async updateImage(id: number | null | undefined, url?: string, state?: boolean, productId?: number) {
+    // Si el id no es un número válido, crea la imagen
+    if (!id || typeof id !== 'number' || isNaN(id)) {
+      return prisma.image.create({
+        data: {
+          url: url ?? '',
+          state: state ?? true,
+          productId: productId!
+        }
+      });
+    }
+
+    // Si el id es válido, intenta actualizar
+    try {
+      return await prisma.image.update({
+        where: { id },
+        data: {
+          url,
+          state,
+          productId
+        },
+      });
+    } catch (error: any) {
+      // Si no existe, la crea
+      if (error.code === 'P2025') {
+        return prisma.image.create({
+          data: {
+            id,
+            url: url ?? '',
+            state: state ?? true,
+            productId: productId!
+          }
+        });
+      }
+      throw error;
+    }
   }
   async deleteImage(id: number) {
     // Soft delete: set state to false
@@ -176,5 +203,23 @@ export class ProductService {
         Images: true,
       },
     });
+  }
+  async getPendingOrderQuantity(productId: number) {
+    // Considera órdenes que NO estén enviadas ni entregadas
+    const orderItems = await prisma.orderItem.findMany({
+      where: {
+        productId,
+        order: {
+          NOT: {
+            status: { in: ['SHIPPED', 'DELIVERED'] }
+          }
+        }
+      },
+      select: { quantity: true }
+    });
+
+    // Suma las cantidades
+    const total = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+    return total;
   }
 }

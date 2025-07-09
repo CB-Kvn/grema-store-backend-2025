@@ -186,7 +186,7 @@ export class ProductController {
         }
         return [];
       })
-      res.json(urls);
+      res.json({ id: image.id, urls });
     } catch (error) {
       res.status(500).json({ error: 'Error updating product' });
     }
@@ -269,4 +269,13 @@ export class ProductController {
       res.status(500).json({ error: 'Error getting best selling products' });
     }
   };
+  
+  async getPendingOrderQuantity(req: Request, res: Response) {
+    const productId = Number(req.params.id);
+    if (isNaN(productId)) {
+      return res.status(400).json({ error: 'Invalid product id' });
+    }
+    const total = await new ProductService().getPendingOrderQuantity(productId);
+    res.json({ productId, pendingQuantity: total });
+  }
 }

@@ -69,64 +69,131 @@ export class PurchaseOrderService {
   }
 
   async updateOrder(id: string, data: any) {
-    try {
-      const { items, documents, ...orderData } = data;
+  try {
+    const { items, documents, ...orderData } = data;
 
-      // 1. Elimina todos los items actuales (para evitar violar la relación requerida)
-      if (Array.isArray(items)) {
-        await prisma.orderItem.deleteMany({ where: { orderId: id } });
+    // Obtener los items y documentos existentes
+    const existingOrder = await prisma.purchaseOrder.findUnique({
+      where: { id },
+      include: {
+        items: true,
+        documents: true
       }
+    });
 
-      // 2. Elimina todos los documentos actuales si los vas a reemplazar
-      if (Array.isArray(documents)) {
-        await prisma.document.deleteMany({ where: { orderId: id } });
-      }
-
-      // 3. Actualiza la orden y crea los nuevos items/documents
-      return await prisma.purchaseOrder.update({
-        where: { id },
-        data: {
-          ...orderData,
-          ...(Array.isArray(items) && {
-            items: {
-              create: items.map((item: any) => ({
-                productId: item.productId,
-                quantity: item.quantity,
-                unitPrice: item.unitPrice,
-                totalPrice: item.totalPrice,
-                qtyDone: item.qtyDone,
-                isGift: item.isGift,
-                isBestSeller: item.isBestSeller,
-                isNew: item.isNew,
-                status: item.status,
-              })),
-            }
-          }),
-          ...(Array.isArray(documents) && {
-            documents: {
-              create: documents.map((doc: any) => ({
-                type: doc.type,
-                title: doc.title,
-                url: doc.url,
-                uploadedAt: doc.uploadedAt,
-                status: doc.status,
-                hash: doc.hash,
-                mimeType: doc.mimeType,
-                size: doc.size,
-              })),
-            }
-          }),
+    // 1. Manejar los items
+    const itemsOperations = Array.isArray(items) ? items.map(item => {
+      return prisma.orderItem.upsert({
+        where: { 
+          id: item.id || '', // Si no tiene id, se creará uno nuevo
+          orderId: id
         },
-        include: {
-          items: { include: { product: true } },
-          documents: true,
+        update: {
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          qtyDone: item.qtyDone,
+          isGift: item.isGift,
+          isBestSeller: item.isBestSeller,
+          isNew: item.isNew,
+          status: item.status,
         },
+        create: {
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          qtyDone: item.qtyDone,
+          isGift: item.isGift,
+          isBestSeller: item.isBestSeller,
+          isNew: item.isNew,
+          status: item.status,
+          orderId: id,
+        }
       });
-    } catch (error) {
-      logger.error(`Error in updateOrder: ${id}`, error);
-      throw error;
+    }) : [];
+
+    // 2. Manejar los documentos
+    const documentsOperations = Array.isArray(documents) ? documents.map(doc => {
+      return prisma.document.upsert({
+        where: { 
+          id: doc.id || '', // Si no tiene id, se creará uno nuevo
+          orderId: id
+        },
+        update: {
+          type: doc.type,
+          title: doc.title,
+          url: doc.url,
+          uploadedAt: doc.uploadedAt,
+          status: doc.status,
+          hash: doc.hash,
+          mimeType: doc.mimeType,
+          size: doc.size,
+        },
+        create: {
+          type: doc.type,
+          title: doc.title,
+          url: doc.url,
+          uploadedAt: doc.uploadedAt,
+          status: doc.status,
+          hash: doc.hash,
+          mimeType: doc.mimeType,
+          size: doc.size,
+          orderId: id,
+        }
+      });
+    }) : [];
+
+    // Ejecutar todas las operaciones en una transacción
+    const [updatedOrder] = await prisma.$transaction([
+      prisma.purchaseOrder.update({
+        where: { id },
+        data: orderData
+      }),
+      ...itemsOperations,
+      ...documentsOperations
+    ]);
+
+    // Eliminar items/documents que no están en los nuevos arrays
+    if (Array.isArray(items)) {
+      const existingItemIds = existingOrder?.items.map(i => i.id) || [];
+      const newItemIds = items.filter(i => i.id).map(i => i.id);
+      const toDelete = existingItemIds.filter(id => !newItemIds.includes(id));
+      
+      if (toDelete.length > 0) {
+        await prisma.orderItem.deleteMany({
+          where: { id: { in: toDelete } }
+        });
+      }
     }
+
+    if (Array.isArray(documents)) {
+      const existingDocIds = existingOrder?.documents.map(d => d.id) || [];
+      const newDocIds = documents.filter(d => d.id).map(d => d.id);
+      const toDelete = existingDocIds.filter(id => !newDocIds.includes(id));
+      
+      if (toDelete.length > 0) {
+        await prisma.document.deleteMany({
+          where: { id: { in: toDelete } }
+        });
+      }
+    }
+
+    // Obtener la orden actualizada con sus relaciones
+    return await prisma.purchaseOrder.findUnique({
+      where: { id },
+      include: {
+        items: { include: { product: true } },
+        documents: true,
+      }
+    });
+
+  } catch (error) {
+    logger.error(`Error in updateOrder: ${id}`, error);
+    throw error;
   }
+}
 
   async deleteOrder(id: string) {
     try {
