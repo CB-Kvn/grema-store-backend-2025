@@ -49,22 +49,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Routes
 router.get('/',expenseController.getAllExpenses);
 router.get('/:id', expenseController.getExpenseById);
 router.post('/', expenseController.createExpense);
 router.put('/:id',  expenseController.updateExpense);
 router.delete('/:id',  expenseController.deleteExpense);
-
-// Additional Routes
 router.get('/category/:category', auth, expenseController.getExpensesByCategory);
-router.get(
-  '/date-range',
-  expenseController.getExpensesByDateRange
-);
+router.get('/date-range',expenseController.getExpensesByDateRange);
 router.get('/file/download', expenseController.downloadFile);
-
-// Endpoint for file upload
 router.post('/upload',upload.single('file'),expenseController.uploadFile);
 
 export default router;

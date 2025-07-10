@@ -16,7 +16,6 @@ export class ProductService {
       throw error;
     }
   }
-
   async getProductById(id: number) {
     try {
       return await prisma.product.findUnique({
@@ -31,7 +30,6 @@ export class ProductService {
       throw error;
     }
   }
-
   async createProduct(data: any) {
     try {
       return await prisma.product.create({
@@ -48,7 +46,6 @@ export class ProductService {
       throw error;
     }
   }
-
   async updateProduct(id: number, data: any) {
     try {
       return await prisma.product.update({
@@ -66,7 +63,6 @@ export class ProductService {
       throw error;
     }
   }
-
   async deleteProduct(id: number) {
     try {
       return await prisma.product.update({
@@ -78,7 +74,6 @@ export class ProductService {
       throw error;
     }
   }
-
   async createProductsBulk(products: any[]) {
     try {
       // Valida que el array no esté vacío
@@ -105,7 +100,6 @@ export class ProductService {
       throw error;
     }
   }
-
   async createImage(data: { url: string; productId: number }) {
 
     return prisma.image.create({

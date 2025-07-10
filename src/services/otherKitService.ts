@@ -24,18 +24,18 @@ interface ImageTransformationOptions {
     [key: string]: any;
 }
 
-export default class ImageKitService {
+export default class OthersKitService {
     private imagekit: ImageKitJS;
 
     constructor() {
-        if (!config.IMAGEKIT_PUBLIC_KEY_PICS || !config.IMAGEKIT_PRIVATE_KEY_PICS || !config.IMAGEKIT_URL_ENDPOINT_PICS) {
+        if (!config.IMAGEKIT_PUBLIC_KEY_OTHERS || !config.IMAGEKIT_PRIVATE_KEY_OTHERS || !config.IMAGEKIT_URL_ENDPOINT_OTHERS) {
             throw new Error("Faltan variables de entorno para ImageKit.");
         }
         
         this.imagekit = new ImageKitJS({
-            publicKey: config.IMAGEKIT_PUBLIC_KEY_PICS,
-            privateKey: config.IMAGEKIT_PRIVATE_KEY_PICS,
-            urlEndpoint: config.IMAGEKIT_URL_ENDPOINT_PICS,
+            publicKey: config.IMAGEKIT_PUBLIC_KEY_OTHERS,
+            privateKey: config.IMAGEKIT_PRIVATE_KEY_OTHERS,
+            urlEndpoint: config.IMAGEKIT_URL_ENDPOINT_OTHERS,
         });
     }
 

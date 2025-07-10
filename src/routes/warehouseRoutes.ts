@@ -36,8 +36,8 @@ router.post(
   warehouseController.addStock
 );
 
-router.delete(
-  '/:warehouseId/stock/:productId',
+router.post(
+  '/remove/:warehouseId/stock/:productId',
   warehouseController.removeStock
 );
 

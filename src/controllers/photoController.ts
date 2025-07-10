@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import CloudinaryService from '../services/cloudinaryService';
 import imageKitService from '../services/imageKitService';
+import fs from 'fs/promises';
 
 export class PhotoController {
     // private cloudinaryService: CloudinaryService;
@@ -18,25 +19,16 @@ export class PhotoController {
                 return;
             }
 
-            const folderName = 'photos_products'; // Cambia esto al nombre de la carpeta deseada
-
-            // const uploadResponses = await Promise.all(
-            //     req.files.map((file: Express.Multer.File) =>
-            //         this.cloudinaryService.uploadImage(file.path, { folder: folderName })
-            //     )
-            // );
+            const folderName = 'photos_products';
 
             const uploadResponses = await Promise.all(
-                req.files.map((file: Express.Multer.File) =>
-                    this.imageKitService.upload(file.path, { folder: folderName })
-                )
+                req.files.map(async (file: Express.Multer.File) => {
+                    const response = await this.imageKitService.upload(file.path, { folder: folderName });
+                    // Elimina el archivo local después de subirlo
+                    await fs.unlink(file.path);
+                    return response;
+                })
             );
-
-            // // Extraer y modificar los secure_url de las respuestas
-            // const secureUrls = uploadResponses.map(response => {
-            //     const modifiedUrl = response.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
-            //     return modifiedUrl;
-            // });
 
             res.status(200).json(uploadResponses);
         } catch (error) {

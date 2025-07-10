@@ -3,12 +3,16 @@ import { ExpenseService } from '../services/expenseService';
 import { logger } from '../utils/logger';
 const expenseService = new ExpenseService();
 import path from 'path';
+import OthersKitService from '../services/otherKitService';
+import fs from 'fs/promises';
 
 export class ExpenseController {
   private expenseService: ExpenseService;
+  private othersKitService: OthersKitService; 
 
   constructor() {
     this.expenseService = new ExpenseService();
+    this.othersKitService = new OthersKitService();
   }
 
   getAllExpenses = async (req: Request, res: Response) => {
@@ -96,26 +100,27 @@ export class ExpenseController {
     }
   };
 
-  async uploadFile(req: Request, res: Response): Promise<void> {
+  uploadFile = async (req: Request, res: Response): Promise<void> => {
     try {
-      if (!req.file) {
-        res.status(400).json({ error: 'No file uploaded' });
+      if (!req.file ) {
+        res.status(400).json({ message: 'No files uploaded' });
         return;
       }
+      const folderName = 'expenses_files';
 
-      const filePath = await expenseService.saveFile(req.file);
-      res.status(200).json({ message: 'File uploaded successfully', filePath });
+      const response = await this.othersKitService.upload(req.file.path, { folder: folderName });
+
+      // Elimina el archivo local después de subirlo
+      await fs.unlink(req.file.path);
+      res.status(200).json(response);
     } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).json({ error: 'Error uploading file' });
-
+      res.status(500).json({ message: 'Error uploading file', error });
     }
-
-  }
-  async downloadFile (req: Request, res: Response): Promise<void> {
+  };
+  async downloadFile(req: Request, res: Response): Promise<void> {
     const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
     try {
-      
+
       const { filePath } = req.query;
 
       if (!filePath || typeof filePath !== 'string') {
