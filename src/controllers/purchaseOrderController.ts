@@ -62,7 +62,7 @@ export class PurchaseOrderController {
   deleteOrder = async (req: Request, res: Response) => {
     try {
       await this.purchaseOrderService.deleteOrder(req.params.id);
-      res.status(204).send();
+      res.status(201).json({ message: 'Order deleted successfully' });
     } catch (error) {
       logger.error('Error deleting order:', error);
       res.status(500).json({ error: 'Error deleting order' });

@@ -14,6 +14,7 @@ import warehouseRoutes from './routes/warehouseRoutes';
 import purchaseOrderRoutes from './routes/purchaseOrderRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import  photoRoutes  from './routes/photoRoutes';
+import discountsRoutes from './routes/discountRoutes';
 import { whatsappRoutes } from './routes/whatappsRoutes';
 import authRoutes from './routes/authRoutes';
 import { dateValidatorMiddleware } from './middleware/dateVerify';
@@ -142,6 +143,7 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/photo', photoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/discounts', discountsRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
