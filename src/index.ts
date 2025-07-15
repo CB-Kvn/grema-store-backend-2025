@@ -27,7 +27,7 @@ const envFile = process.env.NODE_ENV === 'production' ? 'prod.env' : 'dev.env';
 config({ path: path.resolve(__dirname, `../config/${envFile}`) });
 
 const app = express();
-
+app.set('trust proxy', 1);
 // Security Middleware
 app.use(helmet()); // Set security HTTP headers
 app.use(hpp()); // Prevent HTTP Parameter Pollution
