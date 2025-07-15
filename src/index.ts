@@ -24,7 +24,17 @@ import reportRoutes from './routes/reportsRoutes';
 
 // Cargar variables de entorno según el ambiente
 const envFile = process.env.NODE_ENV === 'production' ? 'prod.env' : 'dev.env';
-config({ path: path.resolve(__dirname, `../config/${envFile}`) });
+const envPath = path.resolve(__dirname, `./config/${envFile}`);
+
+// En producción, primero verificar las variables de entorno del sistema
+if (process.env.NODE_ENV === 'production') {
+  // Si no hay variables de entorno críticas, cargar desde archivo
+  if (!process.env.DATABASE_URL) {
+    config({ path: envPath });
+  }
+} else {
+  config({ path: envPath });
+}
 
 const app = express();
 app.set('trust proxy', 1);

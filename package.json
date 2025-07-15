@@ -5,8 +5,13 @@
   "type": "commonjs",
   "scripts": {
     "server:dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "postbuild": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "dotenv -e src/config/dev.env -- npx prisma migrate dev",
+    "prisma:migrate:prod": "prisma migrate deploy",
+    "prisma:db:push": "prisma db push",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
