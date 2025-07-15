@@ -229,14 +229,25 @@ export class PurchaseOrderService {
     }
   }
 
-  async updateDocument(documentId: string, documentData: any) {
+  async updateDocument(orderId: string, documentData: any) {
     try {
-      return await prisma.document.update({
-        where: { id: documentId },
+
+      if (!orderId) {
+        throw new Error('Document ID is required for update');
+      }
+
+      prisma.document.deleteMany({
+        where: { orderId: orderId }
+      }).catch(error => {
+        logger.error(`Error deleting document with ID ${documentData.id} for order ${orderId}:`, error);
+      })
+
+      return await prisma.document.updateMany({
+        where: { id: orderId },
         data: documentData,
       });
     } catch (error) {
-      logger.error(`Error in updateDocument: ${documentId}`, error);
+      logger.error(`Error in updateDocument: ${orderId}`, error);
       throw error;
     }
   }

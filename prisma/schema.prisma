@@ -145,7 +145,7 @@ model StockMovement {
 }
 
 model PurchaseOrder {
-  id                  String            @id @default(uuid())
+  id                  String            @id
   buyerId             String
   firstName           String
   lastName            String

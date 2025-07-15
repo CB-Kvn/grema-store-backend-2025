@@ -60,8 +60,7 @@ router.post(
 );
 
 router.put(
-  '/documents/:documentId',
-  [auth, restrictTo('ADMIN'), validate(documentValidation)],
+  '/:orderId/documents/',
   purchaseOrderController.updateDocument
 );
 
@@ -70,5 +69,7 @@ router.post(
   upload.single('file'),
   purchaseOrderController.uploadFile
 );
+
+router.post('/uploadReceipt', upload.single('file'), purchaseOrderController.uploadFileReceipt);
 
 export default router;

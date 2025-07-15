@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import { PurchaseOrderService } from '../services/purchaseOrderService';
 import { logger } from '../utils/logger';
-
+import OthersKitService from '../services/otherKitService';
+import fs from 'fs/promises';
 
 export class PurchaseOrderController {
   private purchaseOrderService: PurchaseOrderService;
-
+  private othersKitService: OthersKitService;
   constructor() {
     this.purchaseOrderService = new PurchaseOrderService();
+    this.othersKitService = new OthersKitService();
   }
 
   getAllOrders = async (req: Request, res: Response) => {
@@ -86,7 +88,7 @@ export class PurchaseOrderController {
   updateDocument = async (req: Request, res: Response) => {
     try {
       const document = await this.purchaseOrderService.updateDocument(
-        req.params.documentId,
+        req.params.orderId,
         req.body
       );
       res.json(document);
@@ -97,19 +99,39 @@ export class PurchaseOrderController {
   };
 
   uploadFile = async (req: Request, res: Response): Promise<void> => {
-      try {
-        if (!req.file) {
-          res.status(400).json({ error: 'No file uploaded' });
-          return;
-        }
-  
-        const filePath = await this.purchaseOrderService.saveFile(req.file);
-        res.status(200).json({ message: 'File uploaded successfully', filePath });
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        res.status(500).json({ error: 'Error uploading file' });
-  
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: 'No file uploaded' });
+        return;
       }
-  
+
+      const filePath = await this.purchaseOrderService.saveFile(req.file);
+      res.status(200).json({ message: 'File uploaded successfully', filePath });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      res.status(500).json({ error: 'Error uploading file' });
+
     }
+
+  }
+  uploadFileReceipt = async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.file) {
+        res.status(400).json({ message: 'No file uploaded' });
+        return;
+      }
+
+      const folderName = 'purchase_orders_files';
+
+      const response = await this.othersKitService.upload(req.file.path, { folder: folderName });
+
+      // Elimina el archivo local después de subirlo
+      await fs.unlink(req.file.path);
+      
+      res.status(200).json(response);
+    } catch (error) {
+      logger.error('Error uploading purchase order file:', error);
+      res.status(500).json({ message: 'Error uploading file', error });
+    }
+  };
 }
