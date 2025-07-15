@@ -3,7 +3,7 @@ services:
     name: grema-store-backend
     env: node
     plan: free
-    buildCommand: npm ci && npm run prisma:generate && npm run build && npm run prisma:migrate:prod
+    buildCommand: npm ci --include=dev && npm run prisma:generate && npm run build && npm run prisma:migrate:prod
     startCommand: npm start
     envVars:
       - key: NODE_ENV
