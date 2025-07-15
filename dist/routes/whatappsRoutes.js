@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.whatsappRoutes = void 0;
+const express_1 = require("express");
+const whatappsController_1 = require("../controllers/whatappsController");
+const router = (0, express_1.Router)();
+router.post('/messages', whatappsController_1.WhatsAppController.sendTextMessage);
+router.get('/webhook', whatappsController_1.WhatsAppController.handleWebhook);
+router.post('/webhook', whatappsController_1.WhatsAppController.handleWebhook);
+exports.whatsappRoutes = router;

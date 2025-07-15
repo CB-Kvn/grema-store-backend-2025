@@ -27,6 +27,8 @@ El proyecto ya está configurado con:
    - **Environment**: Node
    - **Node Version**: 18+
 
+   <!-- npx prisma generate && npx prisma migrate deploy && npm run server:dev -->
+
 ### 3. Variables de Entorno
 
 En el dashboard de Render, configura estas variables:

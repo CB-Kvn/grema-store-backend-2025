@@ -1,12 +1,15 @@
 {
   "name": "grema-store-backend-2025",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
     "server:dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "prebuild": "rimraf dist",
+    "start": "node ./dist/index.js",
+    "start:debug": "pwd && ls -la && ls -la dist/ && node ./dist/index.js",
+    "start:debug-node": "node debug-start.js",
     "postbuild": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "dotenv -e src/config/dev.env -- npx prisma migrate dev",
@@ -54,6 +57,7 @@
     "eslint": "^8.57.0",
     "nodemon": "^3.1.0",
     "prisma": "^5.10.2",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
