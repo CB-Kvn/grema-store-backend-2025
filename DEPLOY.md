@@ -22,12 +22,12 @@ El proyecto ya está configurado con:
 1. Crea un nuevo Web Service en Render
 2. Conecta tu repositorio de GitHub
 3. Configura:
-   - **Build Command**: `npm install && npm run build && npm run prisma:migrate:prod`
+   - **Build Command**: `npm ci && npm run prisma:generate && npm run build && npm run prisma:migrate:prod`
    - **Start Command**: `npm start`
    - **Environment**: Node
    - **Node Version**: 18+
 
-   <!-- npx prisma generate && npx prisma migrate deploy && npm run server:dev -->
+   **⚠️ IMPORTANTE:** El orden de los comandos es crucial. Prisma debe generarse ANTES de la compilación TypeScript.
 
 ### 3. Variables de Entorno
 
@@ -78,6 +78,13 @@ Después del despliegue:
 #### Error de Build:
 - Revisa los logs de build en Render
 - Verifica que todas las dependencias estén en `package.json`
+- **Error común**: Si aparecen errores TypeScript relacionados con propiedades de Prisma (como `Images`, `google`, `state`, etc.), asegúrate de que el comando de build incluya `npm run prisma:generate` ANTES de `npm run build`
+- **Error "rimraf not found"**: Si aparece este error, significa que hay un problema con el script de limpieza. El proyecto ya está configurado para usar comandos Node.js multiplataforma.
+
+#### Error "Cannot find module dist/index.js":
+- Verifica que el build se complete correctamente
+- Asegúrate de que el archivo `package.json` tenga `"main": "dist/index.js"`
+- Confirma que el comando de start sea `npm start` y no tenga rutas incorrectas
 
 ### 7. Monitoreo
 
@@ -91,8 +98,8 @@ Después del despliegue:
 # Desarrollo
 npm run server:dev
 
-# Build para producción
-npm run build
+# Build para producción (orden correcto)
+npm run prisma:generate && npm run build
 
 # Iniciar en producción
 npm start
@@ -102,4 +109,33 @@ npm run prisma:generate
 
 # Migrar base de datos en producción
 npm run prisma:migrate:prod
+
+# Limpiar dist y rebuild completo
+npm run prebuild && npm run build
+
+# Debug de paths y archivos
+npm run start:debug-node
 ```
+
+## Notas Importantes
+
+### Orden de Comandos en el Build
+Es crucial ejecutar los comandos en el siguiente orden:
+1. `npm ci` - Instalar dependencias
+2. `npm run prisma:generate` - Generar cliente Prisma con todos los tipos
+3. `npm run build` - Compilar TypeScript (ahora puede encontrar todos los tipos de Prisma)
+4. `npm run prisma:migrate:prod` - Aplicar migraciones a la base de datos
+
+### Problemas Comunes y Soluciones
+
+#### Error TypeScript en Build:
+Si aparecen errores como "Property 'Images' does not exist" o similares, significa que el cliente Prisma no se generó antes de la compilación TypeScript. Solución: ejecutar `npm run prisma:generate` antes de `npm run build`.
+
+#### Error "Cannot find module":
+Si el servidor no puede encontrar `dist/index.js`, verifica que:
+- El build se completó exitosamente
+- El archivo `package.json` tenga `"main": "dist/index.js"`
+- El directorio `dist` existe y contiene los archivos compilados
+
+#### Error "rimraf not found":
+Si aparece este error durante el build, significa que hay un problema con el script de limpieza del directorio `dist`. El proyecto está configurado para usar comandos Node.js multiplataforma que no dependen de herramientas externas.
