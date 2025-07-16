@@ -77,7 +77,7 @@ const corsOptions = {
     maxAge: 600
   },
   production: {
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
