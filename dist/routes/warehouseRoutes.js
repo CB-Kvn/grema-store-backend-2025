@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const warehouseController_1 = require("../controllers/warehouseController");
+const validate_1 = require("../middleware/validate");
 const express_validator_1 = require("express-validator");
 const router = (0, express_1.Router)();
 const warehouseController = new warehouseController_1.WarehouseController();
@@ -18,6 +19,10 @@ const stockValidation = [
     (0, express_validator_1.body)('quantity').isInt({ min: 1 }).withMessage('Quantity must be a positive number'),
     (0, express_validator_1.body)('location').notEmpty().withMessage('Location is required'),
 ];
+const priceAndCostValidation = [
+    (0, express_validator_1.body)('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+    (0, express_validator_1.body)('cost').isFloat({ min: 0 }).withMessage('Cost must be a positive number'),
+];
 router.get('/', warehouseController.getAllWarehouses);
 router.get('/:id', warehouseController.getWarehouseById);
 router.post('/', warehouseController.createWarehouse);
@@ -27,4 +32,5 @@ router.post('/:warehouseId/stock/:productId', warehouseController.addStock);
 router.post('/remove/:warehouseId/stock/:productId', warehouseController.removeStock);
 router.post('/transfer/:sourceWarehouseId/:targetWarehouseId/:productId', warehouseController.transferStock);
 router.get('/warehouse-items/product/:productId', warehouseController.getWarehouseItemsByProductId);
+router.put('/items/:itemId/price-cost', priceAndCostValidation, validate_1.validate, warehouseController.updatePriceAndCost);
 exports.default = router;

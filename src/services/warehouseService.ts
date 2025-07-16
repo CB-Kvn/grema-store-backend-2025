@@ -104,8 +104,8 @@ export class WarehouseService {
       return await prisma.warehouseItem.findMany({
         where: { productId },
         include: {
-          warehouse: true, // Incluye información del almacén relacionado
-          product:true   // Incluye imágenes relacionadas
+          warehouse: true,
+          product:true  
         },
       });
     } catch (error) {
@@ -114,7 +114,7 @@ export class WarehouseService {
     }
   }
 
-  async addStock(warehouseId: string, productId: number, quantity: number, location: string, price: number) {
+  async addStock(warehouseId: string, productId: number, quantity: number, location: string) {
     try {
       const item = await prisma.warehouseItem.findFirst({
         where: {
@@ -128,6 +128,7 @@ export class WarehouseService {
         const updatedItem = await prisma.warehouseItem.update({
           where: { id: item.id },
           data: {
+
             quantity: item.quantity + quantity,
             status: this.calculateStockStatus(quantity, item.minimumStock),
           },
@@ -152,7 +153,6 @@ export class WarehouseService {
             productId,
             quantity,
             location,
-            price, // Incluye el precio como obligatorio
             minimumStock: 0, // Establece un valor predeterminado o acepta como parámetro
             status: 'IN_STOCK',
           },
@@ -227,16 +227,53 @@ export class WarehouseService {
     try {
       // Start transaction
       return await prisma.$transaction(async (prisma) => {
+        // Get the source item to retrieve price and cost information
+        const sourceItem = await prisma.warehouseItem.findFirst({
+          where: {
+            warehouseId: sourceWarehouseId,
+            productId,
+          },
+          select: {
+            id: true,
+            location: true,
+            price: true,
+            cost: true,
+            quantity: true,
+          },
+        });
+
+        if (!sourceItem) {
+          throw new Error('Source item not found');
+        }
+
         // Remove from source
         await this.removeStock(sourceWarehouseId, productId, quantity);
 
-        // Add to target
-        await this.addStock(targetWarehouseId, productId, quantity, '', 0); // Replace 0 with the appropriate price value
+        // Add to target with the same price and cost from source
+        await this.addStock(targetWarehouseId, productId, quantity, sourceItem.location);
 
         return { success: true, message: 'Stock transferred successfully' };
       });
     } catch (error) {
       logger.error('Error in transferStock:', error);
+      throw error;
+    }
+  }
+
+  async updatePriceAndCost(itemId: string, price: number, cost: number) {
+    try {
+      const updatedItem = await prisma.warehouseItem.updateMany({
+        where: { productId: Number(itemId) },
+        data: {
+          price,
+          cost,
+        },
+      });
+
+      logger.info(`Price and cost updated for item: ${itemId}`);
+      return updatedItem;
+    } catch (error) {
+      logger.error('Error in updatePriceAndCost:', error);
       throw error;
     }
   }

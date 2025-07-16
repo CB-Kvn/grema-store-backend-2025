@@ -77,7 +77,6 @@ export class WarehouseController {
         Number(req.params.productId),
         req.body.quantity,
         req.body.location,
-        Number(req.body.price)
       );
       res.json(result);
     } catch (error) {
@@ -133,6 +132,55 @@ export class WarehouseController {
     } catch (error) {
       console.error('Error in getWarehouseItemsByProductId:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  // Update price and cost for a specific warehouse item
+  updatePriceAndCost = async (req: Request, res: Response) => {
+    try {
+      const { itemId } = req.params;
+      const { price, cost } = req.body;
+
+      // Validaciones
+      if (!price || !cost) {
+        return res.status(400).json({ 
+          error: 'Price and cost are required',
+          success: false 
+        });
+      }
+
+      if (isNaN(Number(price)) || isNaN(Number(cost))) {
+        return res.status(400).json({ 
+          error: 'Price and cost must be valid numbers',
+          success: false 
+        });
+      }
+
+      if (Number(price) < 0 || Number(cost) < 0) {
+        return res.status(400).json({ 
+          error: 'Price and cost must be positive numbers',
+          success: false 
+        });
+      }
+
+      const updatedItem = await this.warehouseService.updatePriceAndCost(
+        itemId,
+        Number(price),
+        Number(cost)
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Price and cost updated successfully',
+        data: updatedItem
+      });
+    } catch (error) {
+      logger.error('Error updating price and cost:', error);
+      res.status(500).json({ 
+        error: 'Internal server error',
+        success: false,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }
 

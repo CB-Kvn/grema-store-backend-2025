@@ -17,6 +17,7 @@ import  photoRoutes  from './routes/photoRoutes';
 import discountsRoutes from './routes/discountRoutes';
 import { whatsappRoutes } from './routes/whatappsRoutes';
 import authRoutes from './routes/authRoutes';
+import googleRoutes from './routes/googleRoutes';
 import { dateValidatorMiddleware } from './middleware/dateVerify';
 import cookieParser from 'cookie-parser';
 import reportRoutes from './routes/reportsRoutes';
@@ -152,6 +153,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/photo', photoRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/google', googleRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/discounts', discountsRoutes);
 // Health check endpoint

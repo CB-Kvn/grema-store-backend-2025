@@ -43,7 +43,7 @@ export class ReportService {
     });
 
     const totalUnits = items.reduce((acc, i) => acc + i.quantity, 0);
-    const totalInventoryValue = items.reduce((acc, i) => acc + (i.quantity * i.price), 0);
+    const totalInventoryValue = items.reduce((acc, i) => acc + (i.quantity * i.price!), 0);
     const lowStock = items.filter(i => i.status === 'LOW_STOCK').length;
 
     // Cantidad de órdenes pendientes y finalizadas en el periodo

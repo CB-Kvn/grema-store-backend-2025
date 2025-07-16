@@ -22,6 +22,7 @@ const photoRoutes_1 = __importDefault(require("./routes/photoRoutes"));
 const discountRoutes_1 = __importDefault(require("./routes/discountRoutes"));
 const whatappsRoutes_1 = require("./routes/whatappsRoutes");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const googleRoutes_1 = __importDefault(require("./routes/googleRoutes"));
 const dateVerify_1 = require("./middleware/dateVerify");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const reportsRoutes_1 = __importDefault(require("./routes/reportsRoutes"));
@@ -117,6 +118,7 @@ app.use('/api/expenses', expenseRoutes_1.default);
 app.use('/api/whatsapp', whatappsRoutes_1.whatsappRoutes);
 app.use('/api/photo', photoRoutes_1.default);
 app.use('/api/auth', authRoutes_1.default);
+app.use('/api/google', googleRoutes_1.default);
 app.use('/api/reports', reportsRoutes_1.default);
 app.use('/api/discounts', discountRoutes_1.default);
 app.get('/api/health', (req, res) => {

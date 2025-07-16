@@ -116,7 +116,7 @@ class WarehouseService {
             throw error;
         }
     }
-    async addStock(warehouseId, productId, quantity, location, price) {
+    async addStock(warehouseId, productId, quantity, location, price, cost) {
         try {
             const item = await database_1.default.warehouseItem.findFirst({
                 where: {
@@ -128,6 +128,8 @@ class WarehouseService {
                 const updatedItem = await database_1.default.warehouseItem.update({
                     where: { id: item.id },
                     data: {
+                        price: price,
+                        cost: cost,
                         quantity: item.quantity + quantity,
                         status: this.calculateStockStatus(quantity, item.minimumStock),
                     },
@@ -150,6 +152,7 @@ class WarehouseService {
                         quantity,
                         location,
                         price,
+                        cost,
                         minimumStock: 0,
                         status: 'IN_STOCK',
                     },
@@ -209,13 +212,50 @@ class WarehouseService {
     async transferStock(sourceWarehouseId, targetWarehouseId, productId, quantity) {
         try {
             return await database_1.default.$transaction(async (prisma) => {
+                const sourceItem = await prisma.warehouseItem.findFirst({
+                    where: {
+                        warehouseId: sourceWarehouseId,
+                        productId,
+                    },
+                    select: {
+                        id: true,
+                        location: true,
+                        price: true,
+                        cost: true,
+                        quantity: true,
+                    },
+                });
+                if (!sourceItem) {
+                    throw new Error('Source item not found');
+                }
                 await this.removeStock(sourceWarehouseId, productId, quantity);
-                await this.addStock(targetWarehouseId, productId, quantity, '', 0);
+                await this.addStock(targetWarehouseId, productId, quantity, sourceItem.location, sourceItem.price, sourceItem.cost);
                 return { success: true, message: 'Stock transferred successfully' };
             });
         }
         catch (error) {
             logger_1.logger.error('Error in transferStock:', error);
+            throw error;
+        }
+    }
+    async updatePriceAndCost(itemId, price, cost) {
+        try {
+            const updatedItem = await database_1.default.warehouseItem.update({
+                where: { id: itemId },
+                data: {
+                    price,
+                    cost,
+                },
+                include: {
+                    product: true,
+                    warehouse: true,
+                },
+            });
+            logger_1.logger.info(`Price and cost updated for item: ${itemId}`);
+            return updatedItem;
+        }
+        catch (error) {
+            logger_1.logger.error('Error in updatePriceAndCost:', error);
             throw error;
         }
     }

@@ -126,7 +126,8 @@ model WarehouseItem {
   quantity     Int
   minimumStock Int
   location     String
-  price        Float          // Precio del producto en este inventario
+  price        Float?          // Precio del producto en este inventario
+  cost          Float?         // Hacer opcional temporalmente
   status       StockStatus    @default(IN_STOCK)
   lastUpdated  DateTime       @updatedAt
   movements    StockMovement[]
@@ -239,6 +240,7 @@ model Google {
   email    String? @unique
   name     String?
   avatar  String?
+  discounts String[] @default([])
   typeUser UserTypes? @default(BUYER)
   createdAt DateTime? @default(now())
 }

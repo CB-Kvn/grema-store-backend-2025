@@ -63,7 +63,7 @@ class WarehouseController {
         };
         this.addStock = async (req, res) => {
             try {
-                const result = await this.warehouseService.addStock(req.params.warehouseId, Number(req.params.productId), req.body.quantity, req.body.location, Number(req.body.price));
+                const result = await this.warehouseService.addStock(req.params.warehouseId, Number(req.params.productId), req.body.quantity, req.body.location, Number(req.body.price), Number(req.body.cost));
                 res.json(result);
             }
             catch (error) {
@@ -106,6 +106,44 @@ class WarehouseController {
             catch (error) {
                 console.error('Error in getWarehouseItemsByProductId:', error);
                 res.status(500).json({ error: 'Internal server error' });
+            }
+        };
+        this.updatePriceAndCost = async (req, res) => {
+            try {
+                const { itemId } = req.params;
+                const { price, cost } = req.body;
+                if (!price || !cost) {
+                    return res.status(400).json({
+                        error: 'Price and cost are required',
+                        success: false
+                    });
+                }
+                if (isNaN(Number(price)) || isNaN(Number(cost))) {
+                    return res.status(400).json({
+                        error: 'Price and cost must be valid numbers',
+                        success: false
+                    });
+                }
+                if (Number(price) < 0 || Number(cost) < 0) {
+                    return res.status(400).json({
+                        error: 'Price and cost must be positive numbers',
+                        success: false
+                    });
+                }
+                const updatedItem = await this.warehouseService.updatePriceAndCost(itemId, Number(price), Number(cost));
+                res.status(200).json({
+                    success: true,
+                    message: 'Price and cost updated successfully',
+                    data: updatedItem
+                });
+            }
+            catch (error) {
+                logger_1.logger.error('Error updating price and cost:', error);
+                res.status(500).json({
+                    error: 'Internal server error',
+                    success: false,
+                    message: error instanceof Error ? error.message : 'Unknown error'
+                });
             }
         };
         this.warehouseService = new warehouseService_1.WarehouseService();

@@ -67,6 +67,8 @@ class AuthService {
                 name: data.name || user[0].name || '',
                 picture: data.picture || user[0].avatar || '',
                 typeUser: user[0].typeUser || '',
+                discounts: user[0].discounts || [],
+                id: user[0].id,
             },
         };
     }

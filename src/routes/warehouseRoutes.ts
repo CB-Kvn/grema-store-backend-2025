@@ -23,6 +23,11 @@ const stockValidation = [
   body('location').notEmpty().withMessage('Location is required'),
 ];
 
+const priceAndCostValidation = [
+  body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+  body('cost').isFloat({ min: 0 }).withMessage('Cost must be a positive number'),
+];
+
 // Routes
 router.get('/',  warehouseController.getAllWarehouses);
 router.get('/:id',  warehouseController.getWarehouseById);
@@ -47,5 +52,11 @@ router.post(
 );
 
 router.get('/warehouse-items/product/:productId', warehouseController.getWarehouseItemsByProductId);
+
+// Update price and cost for a specific warehouse item
+router.put(
+  '/items/:itemId/price-cost',
+  warehouseController.updatePriceAndCost
+);
 
 export default router;
