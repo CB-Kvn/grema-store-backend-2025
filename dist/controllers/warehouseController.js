@@ -63,7 +63,7 @@ class WarehouseController {
         };
         this.addStock = async (req, res) => {
             try {
-                const result = await this.warehouseService.addStock(req.params.warehouseId, Number(req.params.productId), req.body.quantity, req.body.location, Number(req.body.price), Number(req.body.cost));
+                const result = await this.warehouseService.addStock(req.params.warehouseId, Number(req.params.productId), req.body.quantity, req.body.location);
                 res.json(result);
             }
             catch (error) {

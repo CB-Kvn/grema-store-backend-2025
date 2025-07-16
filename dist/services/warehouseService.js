@@ -116,7 +116,7 @@ class WarehouseService {
             throw error;
         }
     }
-    async addStock(warehouseId, productId, quantity, location, price, cost) {
+    async addStock(warehouseId, productId, quantity, location) {
         try {
             const item = await database_1.default.warehouseItem.findFirst({
                 where: {
@@ -128,8 +128,6 @@ class WarehouseService {
                 const updatedItem = await database_1.default.warehouseItem.update({
                     where: { id: item.id },
                     data: {
-                        price: price,
-                        cost: cost,
                         quantity: item.quantity + quantity,
                         status: this.calculateStockStatus(quantity, item.minimumStock),
                     },
@@ -151,8 +149,6 @@ class WarehouseService {
                         productId,
                         quantity,
                         location,
-                        price,
-                        cost,
                         minimumStock: 0,
                         status: 'IN_STOCK',
                     },
@@ -229,7 +225,7 @@ class WarehouseService {
                     throw new Error('Source item not found');
                 }
                 await this.removeStock(sourceWarehouseId, productId, quantity);
-                await this.addStock(targetWarehouseId, productId, quantity, sourceItem.location, sourceItem.price, sourceItem.cost);
+                await this.addStock(targetWarehouseId, productId, quantity, sourceItem.location);
                 return { success: true, message: 'Stock transferred successfully' };
             });
         }
@@ -240,15 +236,11 @@ class WarehouseService {
     }
     async updatePriceAndCost(itemId, price, cost) {
         try {
-            const updatedItem = await database_1.default.warehouseItem.update({
-                where: { id: itemId },
+            const updatedItem = await database_1.default.warehouseItem.updateMany({
+                where: { productId: Number(itemId) },
                 data: {
                     price,
                     cost,
-                },
-                include: {
-                    product: true,
-                    warehouse: true,
                 },
             });
             logger_1.logger.info(`Price and cost updated for item: ${itemId}`);
