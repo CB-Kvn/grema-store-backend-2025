@@ -41,32 +41,76 @@ export class PurchaseOrderService {
   }
 
   async createOrder(data: any) {
-    try {
-      return await prisma.purchaseOrder.create({
-        data: {
-          ...data,
-          items: {
-            create: data.items.map((item: any) => ({
-              productId: item.product.id,
-              quantity: item.quantity,
-              unitPrice: item.product.WarehouseItem[0].price,
-              totalPrice: item.quantity * item.product.WarehouseItem[0].price,
-            })),
+  try {
+    // Debug logging para entender la estructura
+    logger.info('Creating order with data:', JSON.stringify(data, null, 2));
+    
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error('Items array is required');
+    }
+
+    // Filtrar campos que no existen en el schema
+    const {
+      subtotalWithDiscounts,
+      userDiscounts,
+      appliedDiscounts,
+      ...validOrderData
+    } = data;
+
+    // Usar userDiscounts como discount si existe
+    const orderData = {
+      ...validOrderData,
+      discount: userDiscounts || data.discount || 0,
+      // Si quieres guardar información adicional sobre descuentos, 
+      // puedes agregarla a las notas
+      notes: data.notes || (appliedDiscounts ? 
+        `Descuentos aplicados: ${JSON.stringify(appliedDiscounts)}` : 
+        undefined)
+    };
+
+    return await prisma.purchaseOrder.create({
+      data: {
+        ...orderData,
+        items: {
+          create: data.items.map((item: any) => {
+            // Validar que el item tiene los datos necesarios
+            if (!item.productId) {
+              throw new Error(`Item is missing productId: ${JSON.stringify(item)}`);
+            }
+            
+            if (!item.unitPrice) {
+              throw new Error(`Item is missing unitPrice: ${JSON.stringify(item)}`);
+            }
+
+            return {
+              productId: item.productId,
+              quantity: item.quantity || 1,
+              unitPrice: item.unitPrice,
+              totalPrice: item.totalPrice || (item.quantity * item.unitPrice),
+              qtyDone: item.qtyDone || null,
+              isGift: item.isGift || false,
+              isBestSeller: item.isBestSeller || false,
+              isNew: item.isNew || false,
+              status: item.status || 'PENDING',
+            };
+          }),
+        },
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
           },
         },
-        // include: {
-        //   items: {
-        //     include: {
-        //       product: true,
-        //     },
-        //   },
-        // },
-      });
-    } catch (error) {
-      logger.error('Error in createOrder:', error);
-      throw error;
-    }
+        documents: true,
+      },
+    });
+  } catch (error) {
+    logger.error('Error in createOrder:', error);
+    logger.error('Data received:', JSON.stringify(data, null, 2));
+    throw error;
   }
+}
 
   async updateOrder(id: string, data: any) {
   try {
