@@ -53,6 +53,8 @@ export class GoogleController {
 
       logger.info(`Google user created successfully: ${googleUser.id}`);
 
+      await googleService.sendEmailNotification()
+
       res.status(201).json({
         success: true,
         message: 'Usuario de Google creado exitosamente',

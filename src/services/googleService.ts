@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { UserTypes } from '@prisma/client';
+import nodemailer from 'nodemailer';
 
 const prisma = new PrismaClient();
 
@@ -168,6 +169,34 @@ export class GoogleService {
       throw new Error(`Error finding or creating Google user: ${error}`);
     }
   }
+
+  async sendEmailNotification () {
+  // Configura el transporte
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // Puedes usar otros como 'hotmail', 'outlook', etc.
+    auth: {
+      user: 'grema.store.cr.online@gmail.com',
+      pass: 'fzxm ctcy ajsk hzts', // Usa un token de aplicación si usas Gmail
+    },
+  });
+
+  // Configura el mensajes
+  const mailOptions = {
+    from: '"Mi App" <grema.store.cr.online@gmail.com>',
+    to: "kevinmezamc@gmail.com",
+    // subject,
+    // text,
+    // html, // opcional
+  };
+
+  // Envía el correo
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Correo enviado:', info.messageId);
+  } catch (error) {
+    console.error('Error enviando correo:', error);
+  }
+};
 }
 
 export const googleService = new GoogleService();
