@@ -21,6 +21,7 @@ import googleRoutes from './routes/googleRoutes';
 import { dateValidatorMiddleware } from './middleware/dateVerify';
 import cookieParser from 'cookie-parser';
 import reportRoutes from './routes/reportsRoutes';
+import mailRoutes from './routes/mailRoutes';
 
 
 // Cargar variables de entorno según el ambiente
@@ -156,6 +157,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/google', googleRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/discounts', discountsRoutes);
+app.use('/api/mail', mailRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({

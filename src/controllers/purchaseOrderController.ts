@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PurchaseOrderService } from '../services/purchaseOrderService';
 import { logger } from '../utils/logger';
 import OthersKitService from '../services/otherKitService';
+import { whatsappClient } from '../services/whatapss.service';
 import fs from 'fs/promises';
 
 export class PurchaseOrderController {
@@ -38,6 +39,7 @@ export class PurchaseOrderController {
   createOrder = async (req: Request, res: Response) => {
     try {
       const order = await this.purchaseOrderService.createOrder(req.body);
+      
       res.status(201).json(order);
     } catch (error) {
       logger.error('Error creating order:', error);
