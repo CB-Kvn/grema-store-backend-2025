@@ -3,19 +3,25 @@ import { logger } from '../utils/logger';
 
 export class ProductService {
   async getAllProducts() {
-    try {
-      return await prisma.product.findMany({
-        where: { available: true },
-        include: {
-          WarehouseItem: true,
-          Images: true,
-        },
-      });
-    } catch (error) {
-      logger.error('Error in getAllProducts:', error);
-      throw error;
-    }
+  try {
+    const products = await prisma.product.findMany({
+      where: { available: true },
+      include: {
+        WarehouseItem: true,
+        Images: true,
+      },
+    });
+
+    // Filtra las imágenes por state === true
+    return products.map(product => ({
+      ...product,
+      Images: product.Images ? product.Images.filter(img => img.state === true) : [],
+    }));
+  } catch (error) {
+    logger.error('Error in getAllProducts:', error);
+    throw error;
   }
+}
   async getProductById(id: number) {
     try {
       return await prisma.product.findUnique({
