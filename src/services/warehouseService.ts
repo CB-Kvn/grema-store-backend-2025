@@ -5,15 +5,15 @@ import { logger } from '../utils/logger';
 export class WarehouseService {
   async getAllWarehouses() {
     try {
-      return await prisma.warehouse.findMany({
-        include: {
-          items: {
-            include: {
-              product: true,
-            },
-          },
-        },
+      const warehouses = await prisma.warehouse.findMany({
+        include: { items: true }
       });
+
+      // Agrega la propiedad ocupacion sumando quantity de items
+      return warehouses.map(w => ({
+        ...w,
+        ocupacion: w.items.reduce((acc, item) => acc + item.quantity, 0)
+      }));
     } catch (error) {
       logger.error('Error in getAllWarehouses:', error);
       throw error;
@@ -105,7 +105,7 @@ export class WarehouseService {
         where: { productId },
         include: {
           warehouse: true,
-          product:true  
+          product: true
         },
       });
     } catch (error) {
