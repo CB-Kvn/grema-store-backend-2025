@@ -67,10 +67,13 @@ export class WarehouseService {
 
   async updateWarehouse(id: string, data: any) {
     try {
+      // Elimina la propiedad ocupacion si existe
+      const { ocupacion, ...updateData } = data;
+
       return await prisma.warehouse.update({
         where: { id },
         data: {
-          ...data,
+          ...updateData,
           items: undefined, // Handle items separately to avoid conflicts
         },
         include: {
