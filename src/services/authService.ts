@@ -6,6 +6,7 @@ import { GoogleUser } from '../types';
 import axios from 'axios';
 import { generateToken } from '../utils/tokens';
 import { logger } from '../utils/logger';
+import { UserTypes } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = '7d';
@@ -94,5 +95,77 @@ export class AuthService {
       where: { id },
       data,
     });
+  }
+
+  async registerWithEmail(name: string, email: string, password: string) {
+    // Verificar si el email ya existe
+    const existingUser = await prisma.google.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new AppError('El correo electrónico ya está registrado', 400);
+    }
+
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Crear el usuario
+    const user = await prisma.google.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        typeUser: UserTypes.BUYER
+      },
+    });
+
+    // Generar token
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      name: user.name
+    });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        typeUser: user.typeUser,
+        discounts: user.discounts
+      }
+    };
+  }
+
+  async loginWithEmail(email: string, password: string) {
+    // Buscar el usuario por email
+    const user = await prisma.google.findUnique({ where: { email } });
+    if (!user || !user.password) {
+      throw new AppError('Credenciales inválidas', 401);
+    }
+
+    // Verificar la contraseña
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new AppError('Credenciales inválidas', 401);
+    }
+
+    // Generar token
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      name: user.name
+    });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+        typeUser: user.typeUser,
+        discounts: user.discounts
+      }
+    };
   }
 }

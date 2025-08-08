@@ -57,6 +57,7 @@ model Discount {
   startDate    DateTime
   endDate      DateTime?
   isActive     Boolean        @default(true)
+  isGlobal     Boolean        @default(true)  // Indica si el descuento es global o por cliente
   minQuantity  Int?           // Minimum quantity required for discount
   maxQuantity  Int?           // Maximum quantity allowed for discount
   createdAt    DateTime       @default(now())
@@ -241,6 +242,7 @@ model Google {
   email    String? @unique
   name     String?
   avatar  String?
+  password String?
   discounts String[] @default([])
   typeUser UserTypes? @default(BUYER)
   createdAt DateTime? @default(now())

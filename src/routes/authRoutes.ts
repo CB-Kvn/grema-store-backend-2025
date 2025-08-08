@@ -17,12 +17,27 @@ const registerValidation = [
   body('role').optional().isIn(['USER', 'ADMIN']).withMessage('Invalid role'),
 ];
 
+const registerWithEmailValidation = [
+  body('name').notEmpty().withMessage('Nombre es requerido'),
+  body('email').isEmail().withMessage('Email válido es requerido'),
+  body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+];
+
+const loginWithEmailValidation = [
+  body('email').isEmail().withMessage('Email válido es requerido'),
+  body('password').notEmpty().withMessage('Contraseña es requerida'),
+];
+
 router.post('/login', validate(loginValidation), AuthController.login);
 router.post('/register', validate(registerValidation), AuthController.register);
 router.post('/google-login', AuthController.googleLogin);
 router.get('/authenticate', [authenticateToken], AuthController.authController);
 router.get('/users-all', AuthController.getAll.bind(AuthController));
 router.put('/user/:id', AuthController.update.bind(AuthController));
+
+// Nuevos endpoints para registro y login con email y contraseña
+router.post('/register-email', validate(registerWithEmailValidation), AuthController.registerWithEmail);
+router.post('/login-email', validate(loginWithEmailValidation), AuthController.loginWithEmail);
 
 
 export default router;

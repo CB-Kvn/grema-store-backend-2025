@@ -83,4 +83,52 @@ export class AuthController {
     }
   }
 
+  static async registerWithEmail(req: Request, res: Response) {
+    try {
+      const { name, email, password } = req.body;
+      
+      if (!name || !email || !password) {
+        return res.status(400).json({ error: 'Nombre, email y contraseña son requeridos' });
+      }
+
+      const result = await authService.registerWithEmail(name, email, password);
+      
+      // Establecer cookie segura con el token
+      res.cookie('token', result.token, {
+        httpOnly: true,
+        secure: config.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
+      });
+
+      res.status(201).json({ user: result.user });
+    } catch (error: any) {
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  }
+
+  static async loginWithEmail(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email y contraseña son requeridos' });
+      }
+
+      const result = await authService.loginWithEmail(email, password);
+      
+      // Establecer cookie segura con el token
+      res.cookie('token', result.token, {
+        httpOnly: true,
+        secure: config.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
+      });
+
+      res.status(200).json({ user: result.user });
+    } catch (error: any) {
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  }
+
 }
