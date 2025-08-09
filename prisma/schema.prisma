@@ -67,7 +67,7 @@ model Discount {
 
 enum DiscountType {
   PERCENTAGE
-  FIXED_AMOUNT
+  FIXED
   BUY_X_GET_Y
 }
 
