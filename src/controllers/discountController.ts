@@ -10,6 +10,22 @@ export class DiscountController {
     res.json(discounts);
   }
 
+  async getGlobalDiscounts(req: Request, res: Response) {
+    try {
+      const globalDiscounts = await discountService.getGlobalDiscounts();
+      res.json({
+        success: true,
+        data: globalDiscounts,
+        message: 'Descuentos globales obtenidos exitosamente'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Error al obtener descuentos globales'
+      });
+    }
+  }
+
   async getById(req: Request, res: Response) {
     const id = Number(req.params.id);
     const discount = await discountService.getById(id);

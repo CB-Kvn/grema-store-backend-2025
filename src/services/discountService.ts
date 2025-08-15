@@ -5,6 +5,15 @@ export class DiscountService {
     return prisma.discount.findMany();
   }
 
+  async getGlobalDiscounts() {
+    return prisma.discount.findMany({
+      where: {
+        isGlobal: true,
+        isActive: true
+      }
+    });
+  }
+
   async getById(id: number) {
     return prisma.discount.findUnique({ where: { id } });
   }

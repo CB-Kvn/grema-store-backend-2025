@@ -19,3 +19,25 @@ export interface GoogleUser {
   email_verified: string;
   sub: string; // Google user ID
 }
+
+export interface CreateBannerData {
+  name: string;
+  dateInit: Date;
+  dateEnd: Date;
+  imageUrl: string;
+  status: BannerStatus;
+}
+
+export interface UpdateBannerData {
+  name?: string;
+  dateInit?: Date;
+  dateEnd?: Date;
+  imageUrl?: string;
+  status?: BannerStatus;
+}
+
+export enum BannerStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  EXPIRED = 'EXPIRED'
+}

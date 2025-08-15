@@ -318,3 +318,20 @@ enum ExpenseCategory {
   SERVICES
   OTHER
 }
+
+model Banner {
+  id        String      @id @default(cuid())
+  name      String
+  dateInit  DateTime
+  dateEnd   DateTime
+  imageUrl  String
+  status    BannerStatus
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+enum BannerStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
